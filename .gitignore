@@ -1,0 +1,20 @@
+# Dependências (Nunca subir!)
+node_modules/
+.expo/
+dist/
+
+# Configurações e Chaves (Segurança da Empresa)
+.env
+.env.local
+*.log
+
+# Mobile específico
+ios/
+android/
+
+# Python (Caso use scripts de automação/IA fora do mobile)
+__pycache__/
+venv/
+
+# Sistema
+.DS_Store
