@@ -1,0 +1,11 @@
+export { default as Batom } from "./Batom";
+export { default as Bolsa } from "./Bolsa";
+export { default as Brilho } from "./Brilho";
+export { default as Chaves } from "./Chaves";
+export { default as CopoDeCafé } from "./CopoDeCafé";
+export { default as Coroa } from "./Coroa";
+export { default as Labios } from "./Labios";
+export { default as Pneu } from "./Pneu";
+export { default as Salto } from "./Salto";
+export { default as StanleyWithCut } from "./StanleyWithCut";
+export { default as Stanley } from "./Stanley";
