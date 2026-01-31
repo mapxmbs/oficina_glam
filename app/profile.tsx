@@ -205,7 +205,7 @@ export default function ProfileScreen() {
   // Loading inicial
   if (loading && !profile) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.rosaClaro }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.headerBg} />
           <Text 
@@ -389,7 +389,7 @@ export default function ProfileScreen() {
           >
             <View className="flex-row items-center mb-5">
               <View 
-                style={{ backgroundColor: colors.rosaClaro }} 
+                style={{ backgroundColor: colors.background }} 
                 className="w-10 h-10 rounded-full items-center justify-center mr-3"
               >
                 <User size={20} color="white" />
@@ -515,7 +515,7 @@ export default function ProfileScreen() {
           >
             <View className="flex-row items-center mb-5">
               <View 
-                style={{ backgroundColor: colors.rosaClaro }} 
+                style={{ backgroundColor: colors.background }} 
                 className="w-10 h-10 rounded-full items-center justify-center mr-3"
               >
                 <Mail size={20} color="white" />
@@ -635,7 +635,7 @@ export default function ProfileScreen() {
           >
             <View className="flex-row items-center mb-5">
               <View 
-                style={{ backgroundColor: colors.rosaClaro }} 
+                style={{ backgroundColor: colors.background }} 
                 className="w-10 h-10 rounded-full items-center justify-center mr-3"
               >
                 <Crown size={20} color="white" />

@@ -6,10 +6,10 @@ module.exports = {
     extend: {
       colors: {
         glam: {
-          primary: '#E91E63', // Rosa Forte (Logo/Botões)
-          light: '#FCE4EC',   // Rosa Bem Claro (Fundo suave)
-          dark: '#880E4F',    // Vinho (Textos importantes)
-          text: '#4A4A4A',    // Cinza Escuro (Leitura fácil)
+          primary: '#B91C5C',
+          light: '#FDF2F6',
+          dark: '#0F0F0F',
+          text: '#5C5C5C',
         }
       },
     },

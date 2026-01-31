@@ -1,33 +1,41 @@
+/**
+ * Paleta Oficina Glam – Minimal Glam (base c8f8111)
+ * Base neutra. Rosa APENAS como accent.
+ */
+
 export const colors = {
-  // Paleta Rosa DIVA - Do Suave ao Intenso (Harmonia e Contraste)
-  rosaSuper: '#F5EEEE',      // Rosa super suave - cards sutis, elementos delicados
-  rosaClaro: '#F7A8C4',      // Rosa claro - ícones, elementos secundários
-  rosaMedio: '#F37199',      // Rosa médio - detalhes, bordas suaves
-  rosaVibrante: '#E53888',   // Rosa vibrante - detalhes importantes, hover states
-  rosaInteso: '#C3195D',     // Rosa intenso - elementos intermediários
-  rosaEscuro: '#AC1754',     // Rosa escuro - headers, barras de navegação, CTAs principais
-  
-  // Cores Funcionais (ajustadas para novo esquema)
-  primary: '#AC1754',        // Principal agora usa o rosa escuro (headers/nav)
-  primaryDark: '#8B1144',    // Ainda mais escuro para hover/active
-  primaryLight: '#F5EEEE',   // Claro usa o rosa super suave
-  
-  secondary: '#8E24AA',      // Secundária roxa (complementar)
-  secondaryLight: '#F3E5F5', 
-  
-  success: '#00C853',        
-  warning: '#FFAB00',        
-  danger: '#FF1744',         
-  
-  // Aplicações Específicas
-  background: '#F5EEEE',     // Fundo geral - rosa super suave para contraste
-  surface: '#FFFFFF',        // Cards e superfícies elevadas
-  surfaceTint: '#FAF5F5',    // Superfícies com leve toque de rosa
-  text: '#2D2D2D',           // Texto principal escuro
-  textLight: '#757575',      // Texto secundário
-  border: '#F7A8C4',         // Bordas agora usam rosa claro para suavidade
-  
-  // Cores de Destaque (novo)
-  headerBg: '#AC1754',       // Background de headers e barras
-  iconHighlight: '#F7A8C4',  // Ícones de destaque
-};
+  accent: '#B91C5C',
+  accentSoft: '#FDF2F6',
+
+  iconPrimary: '#B91C5C',
+  iconOnAccent: '#FFFFFF',
+  iconNeutral: '#0F0F0F',
+  iconMuted: '#8E8E8E',
+
+  background: '#F8F7F9',
+  surface: '#FFFFFF',
+  surfaceTint: '#FAF8FA',
+  border: '#EBE8EC',
+  borderMedium: '#DFDBE0',
+
+  text: '#0F0F0F',
+  textSecondary: '#5C5C5C',
+  textTertiary: '#8E8E8E',
+
+  success: '#059669',
+  warning: '#D97706',
+  danger: '#DC2626',
+
+  whatsapp: '#25D366',
+
+  /** Aliases compatibilidade (base c8f8111 → minimal glam) */
+  primary: '#B91C5C',
+  headerBg: '#B91C5C',
+  textLight: '#5C5C5C',
+  cardBg: '#FFFFFF',
+  rosaClaro: '#FDF2F6',
+  rosaMedio: '#B91C5C',
+  rosaEscuro: '#B91C5C',
+  rosaSuper: '#FFFFFF',
+  rosaInteso: '#B91C5C',
+} as const;

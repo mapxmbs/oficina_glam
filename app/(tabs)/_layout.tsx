@@ -1,144 +1,62 @@
 import { Tabs } from 'expo-router';
-import { Car, Droplet, Home, MapPin, Sparkles, Wrench } from 'lucide-react-native';
-import { Platform, View } from 'react-native';
-
-// ⚠️ ATENÇÃO AQUI: Esse caminho "../.." sobe duas pastas.
-// Ele sai de "(tabs)", sai de "app" e procura "src" na raiz do projeto.
+import { Droplet, MapPin } from 'lucide-react-native';
+import { Dimensions, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BrilhoIcon, ChavesIcon, PneuIcon } from '../../components/icons';
+import { getIconColor } from '../../src/theme/icon-colors';
 import { colors } from '../../src/theme/colors';
 
+const { width: w } = Dimensions.get('window');
+const isNarrow = w < 360;
+const iconSize = Platform.OS === 'ios' ? (isNarrow ? 20 : 22) : (isNarrow ? 18 : 20);
+const iconSizeFocused = Platform.OS === 'ios' ? (isNarrow ? 22 : 24) : (isNarrow ? 20 : 22);
+const tabBarContentHeight = Platform.OS === 'ios' ? (isNarrow ? 48 : 52) : (isNarrow ? 46 : 50);
+const tabBarPaddingTop = isNarrow ? 6 : 8;
+const tabBarMarginH = isNarrow ? 24 : 32;
+const tabBarRadius = 28;
+
+const tabIconColor = (focused: boolean) => getIconColor(focused ? 'primary' : 'muted');
+
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'ios' ? 20 : 12);
+
   return (
     <Tabs
+      initialRouteName="index"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: 'white',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.5)',
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: colors.iconPrimary,
+        tabBarInactiveTintColor: colors.iconMuted,
         tabBarStyle: {
-          backgroundColor: colors.headerBg,
+          position: 'absolute',
+          left: tabBarMarginH,
+          right: tabBarMarginH,
+          bottom: bottomInset + 8,
+          height: tabBarContentHeight + tabBarPaddingTop,
+          backgroundColor: 'rgba(255,255,255,0.95)',
           borderTopWidth: 0,
-          elevation: 10,
+          borderRadius: tabBarRadius,
+          borderWidth: 1,
+          borderColor: colors.border,
+          overflow: 'hidden',
+          elevation: 4,
           shadowColor: '#000',
-          shadowOpacity: 0.1,
-          shadowOffset: { width: 0, height: -4 },
-          shadowRadius: 10,
-          height: Platform.OS === 'ios' ? 85 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 25 : 10,
-          paddingTop: 10,
+          shadowOpacity: 0.06,
+          shadowOffset: { width: 0, height: 2 },
+          shadowRadius: 12,
+          paddingTop: tabBarPaddingTop,
+          paddingBottom: 0,
         },
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
-          marginTop: 2,
-          fontFamily: 'Inter-Regular', // Fonte consistente entre iOS e Android
-        },
+        tabBarItemStyle: { paddingVertical: isNarrow ? 4 : 6 },
       }}
     >
-      <Tabs.Screen
-        name="vehicle"
-        options={{
-          title: 'Meu Carro',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{ 
-                backgroundColor: focused ? colors.rosaClaro : 'transparent', 
-                padding: 8, 
-                borderRadius: 20,
-                shadowColor: focused ? colors.rosaClaro : 'transparent',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                elevation: focused ? 4 : 0
-            }}>
-                <Car size={22} color={color} strokeWidth={2.5} />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="fuel"
-        options={{
-          title: 'Combustível',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{ 
-                backgroundColor: focused ? colors.rosaClaro : 'transparent', 
-                padding: 8, 
-                borderRadius: 20,
-                shadowColor: focused ? colors.rosaClaro : 'transparent',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                elevation: focused ? 4 : 0
-            }}>
-                <Droplet size={22} color={color} strokeWidth={2.5} />
-            </View>
-          ),
-        }}
-      />
-      
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Início',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{ 
-                backgroundColor: focused ? colors.rosaClaro : 'transparent', 
-                padding: focused ? 12 : 8, 
-                borderRadius: 24,
-                shadowColor: focused ? colors.rosaClaro : 'transparent',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.4,
-                shadowRadius: 8,
-                elevation: focused ? 8 : 0,
-                borderWidth: focused ? 3 : 0,
-                borderColor: 'white'
-            }}>
-                <Sparkles size={focused ? 26 : 22} color={color} strokeWidth={focused ? 3 : 2.5} />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="maintenance"
-        options={{
-          title: 'Histórico',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{ 
-                backgroundColor: focused ? colors.rosaClaro : 'transparent', 
-                padding: 8, 
-                borderRadius: 20,
-                shadowColor: focused ? colors.rosaClaro : 'transparent',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                elevation: focused ? 4 : 0
-            }}>
-                <Wrench size={22} color={color} strokeWidth={2.5} />
-            </View>
-          ),
-        }}
-      />
-
-      <Tabs.Screen
-        name="workshops"
-        options={{
-          title: 'Oficinas',
-          tabBarIcon: ({ color, focused }) => (
-            <View style={{ 
-                backgroundColor: focused ? colors.rosaClaro : 'transparent', 
-                padding: 8, 
-                borderRadius: 20,
-                shadowColor: focused ? colors.rosaClaro : 'transparent',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
-                shadowRadius: 4,
-                elevation: focused ? 4 : 0
-            }}>
-                <MapPin size={22} color={color} strokeWidth={2.5} />
-            </View>
-          ),
-        }}
-      />
+      <Tabs.Screen name="vehicle" options={{ title: 'Meu Carro', tabBarIcon: ({ focused }) => <PneuIcon size={iconSize} color={tabIconColor(focused)} /> }} />
+      <Tabs.Screen name="fuel" options={{ title: 'Combustível', tabBarIcon: ({ focused }) => <Droplet size={iconSize} color={tabIconColor(focused)} strokeWidth={2} /> }} />
+      <Tabs.Screen name="index" options={{ title: 'Início', tabBarIcon: ({ focused }) => <BrilhoIcon size={focused ? iconSizeFocused : iconSize} color={tabIconColor(focused)} /> }} />
+      <Tabs.Screen name="maintenance" options={{ title: 'Histórico', tabBarIcon: ({ focused }) => <ChavesIcon size={iconSize} color={tabIconColor(focused)} /> }} />
+      <Tabs.Screen name="workshops" options={{ title: 'Oficinas', tabBarIcon: ({ focused }) => <MapPin size={iconSize} color={tabIconColor(focused)} strokeWidth={2} /> }} />
     </Tabs>
   );
 }
