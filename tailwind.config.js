@@ -6,7 +6,7 @@ module.exports = {
     extend: {
       colors: {
         glam: {
-          primary: '#B91C5C',
+          primary: '#8B2942',
           light: '#FDF2F6',
           dark: '#0F0F0F',
           text: '#5C5C5C',

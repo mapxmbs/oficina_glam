@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { Calendar, ChevronDown, FileText, Filter, MapPin, Plus, Trash2, Wrench, X } from 'lucide-react-native';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Alert, FlatList, Image, Modal, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
@@ -9,7 +9,6 @@ import { colors } from '../../src/theme/colors';
 export default function MaintenanceScreen() {
   const router = useRouter();
   const [maintenanceList, setMaintenanceList] = useState<any[]>([]);
-  const [filteredList, setFilteredList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   // Estado para controlar o Modal de Detalhes
@@ -32,7 +31,6 @@ export default function MaintenanceScreen() {
 
       if (error) throw error;
       setMaintenanceList(data || []);
-      applyFilters(data || [], filterType);
     } catch (error) {
       console.error(error);
       Alert.alert("Ops!", "Não conseguimos carregar o histórico.");
@@ -41,19 +39,32 @@ export default function MaintenanceScreen() {
     }
   }
 
-  // Função para aplicar filtros
-  function applyFilters(list: any[], type: string) {
-    if (type === 'todos') {
-      setFilteredList(list);
-    } else {
-      setFilteredList(list.filter(item => item.tipo === type));
-    }
-  }
+  // Agrupa por tipo e detecta padrões anormais (mesmo serviço em menos de 30 dias)
+  const { groupedByTipo, abnormalIds } = useMemo(() => {
+    const grupos: Record<string, any[]> = {};
+    const abnormal: number[] = [];
+    const list = filterType === 'todos' ? maintenanceList : maintenanceList.filter((i: any) => i.tipo === filterType);
+    list.forEach((item: any) => {
+      if (!grupos[item.tipo]) grupos[item.tipo] = [];
+      grupos[item.tipo].push(item);
+    });
+    Object.values(grupos).forEach((items: any[]) => {
+      if (items.length < 2) return;
+      const sorted = [...items].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime());
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const d1 = new Date(sorted[i].data);
+        const d2 = new Date(sorted[i + 1].data);
+        const dias = Math.abs((d1.getTime() - d2.getTime()) / (1000 * 60 * 60 * 24));
+        if (dias < 30) abnormal.push(sorted[i].id);
+      }
+    });
+    return { groupedByTipo: grupos, abnormalIds: abnormal };
+  }, [maintenanceList, filterType]);
 
-  // Atualiza filtros quando o tipo muda
-  useCallback(() => {
-    applyFilters(maintenanceList, filterType);
-  }, [filterType, maintenanceList]);
+  const filteredList = useMemo(() => {
+    if (filterType === 'todos') return maintenanceList;
+    return maintenanceList.filter((item: any) => item.tipo === filterType);
+  }, [maintenanceList, filterType]);
 
   useFocusEffect(
     useCallback(() => {
@@ -123,19 +134,23 @@ export default function MaintenanceScreen() {
         {/* Header do Card */}
         <View className="flex-row justify-between items-start mb-3">
           <View className="flex-1">
-            <Text 
-              style={{ 
-                color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium' 
-              }} 
-              className="text-lg font-bold capitalize mb-1"
-            >
-              {item.tipo}
-            </Text>
+            <View className="flex-row items-center gap-2">
+              <Text 
+                style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} 
+                className="text-lg font-bold capitalize"
+              >
+                {item.tipo}
+              </Text>
+              {abnormalIds.includes(item.id) && (
+                <View style={{ backgroundColor: colors.warning + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 }}>
+                  <Text style={{ color: colors.warning, fontFamily: 'Inter_600SemiBold', fontSize: 10 }}>Padrão fora do normal</Text>
+                </View>
+              )}
+            </View>
             <View className="flex-row items-center">
               <Calendar size={12} color={colors.textLight} />
               <Text 
-                style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} 
+                style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
                 className="text-xs ml-1"
               >
                 {item.data}
@@ -147,14 +162,14 @@ export default function MaintenanceScreen() {
             <Text 
               style={{ 
                 color: colors.headerBg,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="text-lg font-bold"
             >
               R$ {item.valor}
             </Text>
             <Text 
-              style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} 
+              style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
               className="text-xs mt-1"
             >
               {item.km} km
@@ -165,12 +180,12 @@ export default function MaintenanceScreen() {
         {/* Oficina */}
         {item.oficina && (
           <View 
-            style={{ backgroundColor: colors.rosaClaro }} 
+            style={{ backgroundColor: colors.accentSoft }} 
             className="flex-row items-center p-2 rounded-lg mb-2"
           >
-            <MapPin size={12} color="white" />
+            <MapPin size={12} color={colors.iconPrimary} />
             <Text 
-              style={{ color: "white", fontFamily: 'Inter-Regular' }} 
+              style={{ color: colors.iconPrimary, fontFamily: 'Inter_400Regular' }} 
               className="text-xs ml-1 flex-1" 
               numberOfLines={1}
             >
@@ -182,7 +197,7 @@ export default function MaintenanceScreen() {
         {/* Preview das notas */}
         {item.notas && (
           <Text 
-            style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} 
+            style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
             className="text-xs italic" 
             numberOfLines={2}
           >
@@ -194,15 +209,15 @@ export default function MaintenanceScreen() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }} className="pt-4">
-      {/* Cabeçalho da Tela */
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, paddingTop: 16 }}>
+      {/* Cabecalho */}
       <View className="px-5 mb-4">
         <View className="flex-row justify-between items-center mb-4">
           <View>
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'LoveloBlack',
+                fontFamily: 'Inter_700Bold',
                 textTransform: 'uppercase' 
               }} 
               className="text-2xl font-bold"
@@ -210,7 +225,7 @@ export default function MaintenanceScreen() {
               Histórico
             </Text>
             <Text 
-              style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} 
+              style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
               className="text-sm mt-1"
             >
               {filteredList.length} {filteredList.length === 1 ? 'serviço registrado' : 'serviços registrados'}
@@ -233,7 +248,6 @@ export default function MaintenanceScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Botão de Filtro Melhorado */}
         <TouchableOpacity 
           onPress={() => setShowFilters(!showFilters)}
           style={{ 
@@ -248,7 +262,7 @@ export default function MaintenanceScreen() {
             <Text 
               style={{ 
                 color: colors.text,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="font-semibold ml-2"
             >
@@ -271,7 +285,16 @@ export default function MaintenanceScreen() {
         </TouchableOpacity>
       </View>
 
-          }{showFilters && (
+      {abnormalIds.length > 0 && (
+        <View className="px-5 mb-4">
+          <View style={{ backgroundColor: colors.accentSoft, padding: 12, borderRadius: 12, borderLeftWidth: 4, borderLeftColor: colors.accent }}>
+            <Text style={{ color: colors.text, fontFamily: 'Inter_600SemiBold', fontSize: 13 }}>Em breve: análise inteligente de frequência</Text>
+            <Text style={{ color: colors.textSecondary, fontFamily: 'Inter_400Regular', fontSize: 12, marginTop: 4 }}>A IA vai identificar padrões fora do normal automaticamente.</Text>
+          </View>
+        </View>
+      )}
+
+      {showFilters && (
         <View className="px-5 mb-4">
           <ScrollView 
             horizontal 
@@ -283,10 +306,7 @@ export default function MaintenanceScreen() {
               return (
                 <TouchableOpacity
                   key={tipo}
-                  onPress={() => {
-                    setFilterType(tipo);
-                    applyFilters(maintenanceList, tipo);
-                  }}
+                  onPress={() => setFilterType(tipo)}
                   style={{
                     backgroundColor: isActive ? colors.headerBg : colors.surface,
                     borderWidth: isActive ? 0 : 1,
@@ -302,11 +322,11 @@ export default function MaintenanceScreen() {
                   <Text 
                     style={{
                       color: isActive ? colors.surface : colors.text,
-                      fontFamily: isActive ? 'MontserratAlternates-Medium' : 'Inter-Regular'
+                      fontFamily: isActive ? 'Inter_600SemiBold' : 'Inter_400Regular'
                     }}
                     className="font-medium"
                   >
-                    {tipo === 'todos' ? '🔥 Todos' : tipo}
+                    {tipo === 'todos' ? 'Todos' : tipo}
                   </Text>
                 </TouchableOpacity>
               );
@@ -337,7 +357,7 @@ export default function MaintenanceScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }} 
                       className="text-lg text-center mb-2"
                     >
@@ -346,7 +366,7 @@ export default function MaintenanceScreen() {
                     <Text 
                       style={{ 
                         color: colors.textLight,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }} 
                       className="text-sm text-center px-8"
                     >

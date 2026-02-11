@@ -1,7 +1,8 @@
 import { Tabs } from 'expo-router';
 import { Droplet, MapPin } from 'lucide-react-native';
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FloatingChatButton } from '../../components/FloatingChatButton';
 import { BrilhoIcon, ChavesIcon, PneuIcon } from '../../components/icons';
 import { getIconColor } from '../../src/theme/icon-colors';
 import { colors } from '../../src/theme/colors';
@@ -22,6 +23,7 @@ export default function TabLayout() {
   const bottomInset = insets.bottom > 0 ? insets.bottom : (Platform.OS === 'ios' ? 20 : 12);
 
   return (
+    <View style={{ flex: 1 }}>
     <Tabs
       initialRouteName="index"
       screenOptions={{
@@ -35,11 +37,10 @@ export default function TabLayout() {
           right: tabBarMarginH,
           bottom: bottomInset + 8,
           height: tabBarContentHeight + tabBarPaddingTop,
-          backgroundColor: 'rgba(255,255,255,0.95)',
+          backgroundColor: colors.surface,
           borderTopWidth: 0,
           borderRadius: tabBarRadius,
-          borderWidth: 1,
-          borderColor: colors.border,
+          borderWidth: 0,
           overflow: 'hidden',
           elevation: 4,
           shadowColor: '#000',
@@ -58,5 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen name="maintenance" options={{ title: 'Histórico', tabBarIcon: ({ focused }) => <ChavesIcon size={iconSize} color={tabIconColor(focused)} /> }} />
       <Tabs.Screen name="workshops" options={{ title: 'Oficinas', tabBarIcon: ({ focused }) => <MapPin size={iconSize} color={tabIconColor(focused)} strokeWidth={2} /> }} />
     </Tabs>
+    <FloatingChatButton />
+    </View>
   );
 }

@@ -1,22 +1,27 @@
 /**
- * Paleta Oficina Glam – Minimal Glam (base c8f8111)
- * Base neutra. Rosa APENAS como accent.
+ * Paleta Oficina Glam – Premium, Glam, Contraste Real
+ * Planos claros, médios e escuros. Beterraba com presença.
  */
 
 export const colors = {
-  accent: '#B91C5C',
+  accent: '#8B2942',
+  accentDark: '#6B1F33',
   accentSoft: '#FDF2F6',
+  accentMuted: '#E8DEE4',
 
-  iconPrimary: '#B91C5C',
+  iconPrimary: '#8B2942',
   iconOnAccent: '#FFFFFF',
   iconNeutral: '#0F0F0F',
   iconMuted: '#8E8E8E',
 
-  background: '#F8F7F9',
+  /** Fundo de tela – plano médio, contraste com surface branca */
+  background: '#F2EDF0',
+  /** Branco – cards e superfícies principais, âncoras visuais */
   surface: '#FFFFFF',
-  surfaceTint: '#FAF8FA',
-  border: '#EBE8EC',
-  borderMedium: '#DFDBE0',
+  /** Alternância/respiro – uso controlado, não estrutura principal */
+  surfaceTint: '#FAF7F9',
+  border: '#E5DEE2',
+  borderMedium: '#D8D0D5',
 
   text: '#0F0F0F',
   textSecondary: '#5C5C5C',
@@ -28,14 +33,14 @@ export const colors = {
 
   whatsapp: '#25D366',
 
-  /** Aliases compatibilidade (base c8f8111 → minimal glam) */
-  primary: '#B91C5C',
-  headerBg: '#B91C5C',
+  /** Aliases compatibilidade */
+  primary: '#8B2942',
+  headerBg: '#8B2942',
   textLight: '#5C5C5C',
   cardBg: '#FFFFFF',
   rosaClaro: '#FDF2F6',
-  rosaMedio: '#B91C5C',
-  rosaEscuro: '#B91C5C',
+  rosaMedio: '#8B2942',
+  rosaEscuro: '#8B2942',
   rosaSuper: '#FFFFFF',
-  rosaInteso: '#B91C5C',
+  rosaInteso: '#8B2942',
 } as const;

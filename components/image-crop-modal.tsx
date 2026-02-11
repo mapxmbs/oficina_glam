@@ -123,7 +123,7 @@ export default function ImageCropModal({
             <Text
               style={{
                 color: 'white',
-                fontFamily: 'MontserratAlternates-Medium',
+                fontFamily: 'Inter_600SemiBold',
                 fontSize: 20,
                 fontWeight: 'bold',
               }}
@@ -177,7 +177,7 @@ export default function ImageCropModal({
               <Text
                 style={{
                   color: 'rgba(255,255,255,0.6)',
-                  fontFamily: 'Inter-Regular',
+                  fontFamily: 'Inter_400Regular',
                   fontSize: 14,
                   textAlign: 'center',
                   paddingHorizontal: 20,
@@ -195,13 +195,13 @@ export default function ImageCropModal({
                 onPress={handleConfirm}
                 disabled={loading}
                 style={{
-                  backgroundColor: colors.rosaClaro,
+                  backgroundColor: colors.accent,
                   paddingVertical: Platform.OS === 'ios' ? 16 : 14,
                   borderRadius: 16,
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  shadowColor: colors.rosaClaro,
+                  shadowColor: colors.accent,
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.4,
                   shadowRadius: 8,
@@ -216,8 +216,8 @@ export default function ImageCropModal({
                     <Check size={20} color={colors.iconOnAccent} />
                     <Text
                       style={{
-                        color: 'white',
-                        fontFamily: 'Inter-Regular',
+                        color: colors.iconOnAccent,
+                        fontFamily: 'Inter_400Regular',
                         fontSize: 16,
                         fontWeight: 'bold',
                         marginLeft: 8,
@@ -246,7 +246,7 @@ export default function ImageCropModal({
                 <Text
                   style={{
                     color: 'white',
-                    fontFamily: 'Inter-Regular',
+                    fontFamily: 'Inter_400Regular',
                     fontSize: 14,
                     textAlign: 'center',
                   }}
@@ -281,7 +281,7 @@ export default function ImageCropModal({
                   <Text
                     style={{
                       color: 'white',
-                      fontFamily: 'Inter-Regular',
+                      fontFamily: 'Inter_400Regular',
                       fontSize: 16,
                       fontWeight: 'bold',
                     }}
@@ -312,7 +312,7 @@ export default function ImageCropModal({
                   <Text
                     style={{
                       color: 'white',
-                      fontFamily: 'Inter-Regular',
+                      fontFamily: 'Inter_400Regular',
                       fontSize: 16,
                       fontWeight: 'bold',
                     }}

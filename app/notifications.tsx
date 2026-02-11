@@ -138,14 +138,14 @@ export default function NotificationsScreen() {
           <Text 
             style={{ 
               color: colors.rosaEscuro,
-              fontFamily: 'LoveloBlack',
+              fontFamily: 'Inter_700Bold',
               textTransform: 'uppercase' 
             }} 
             className="text-xl font-bold"
           >
             Lembretes
           </Text>
-          <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} className="text-xs">
+          <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-xs">
             Mantenha seu carro sempre em dia
           </Text>
         </View>
@@ -171,7 +171,7 @@ export default function NotificationsScreen() {
           <View className="flex-row items-center mb-3">
             <Bell size={24} color="white" />
             <Text 
-              style={{ fontFamily: 'LoveloBlack', textTransform: 'uppercase' }} 
+              style={{ fontFamily: 'Inter_700Bold', textTransform: 'uppercase' }} 
               className="text-white text-lg font-bold ml-2"
             >
               Próximo Alerta
@@ -182,7 +182,7 @@ export default function NotificationsScreen() {
             Revisão dos 10.000 km
           </Text>
           
-          <Text style={{ fontFamily: 'Inter-Regular' }} className="text-white opacity-90 text-sm mb-4">
+          <Text style={{ fontFamily: 'Inter_400Regular' }} className="text-white opacity-90 text-sm mb-4">
             Faltam aproximadamente 500 km ou 15 dias
           </Text>
 
@@ -193,7 +193,7 @@ export default function NotificationsScreen() {
               className="flex-1 py-3 rounded-xl items-center"
             >
               <Text style={{ fontFamily: 'MontserratAlternates-Medium' }} className="text-white font-bold">
-                ✓ Já fiz
+                Já fiz
               </Text>
             </TouchableOpacity>
             
@@ -250,7 +250,7 @@ export default function NotificationsScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'Inter-Regular' 
+                  fontFamily: 'Inter_400Regular' 
                 }} 
                 className="text-xs"
               >
@@ -296,7 +296,7 @@ export default function NotificationsScreen() {
           }} 
           className="text-lg font-bold mb-3 mt-4"
         >
-          🤖 Recomendações Inteligentes
+          Recomendações Inteligentes
         </Text>
 
         <View 
@@ -327,7 +327,7 @@ export default function NotificationsScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'Inter-Regular' 
+                  fontFamily: 'Inter_400Regular' 
                 }} 
                 className="text-sm"
               >
@@ -368,12 +368,12 @@ export default function NotificationsScreen() {
             }} 
             className="font-bold mb-2"
           >
-            🚀 Em Breve
+            Em Breve
           </Text>
           <Text 
             style={{ 
               color: colors.textLight,
-              fontFamily: 'Inter-Regular' 
+              fontFamily: 'Inter_400Regular' 
             }} 
             className="text-xs leading-5"
           >

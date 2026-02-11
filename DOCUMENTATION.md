@@ -1,7 +1,7 @@
 # 📱 Oficina Glam - Documentação Completa
 > App de manutenção automotiva para mulheres (DIVAs) 💅🚗
 
-**Última atualização:** 18 de Dezembro de 2025
+**Última atualização:** 27 de Janeiro de 2026
 
 ---
 
@@ -62,6 +62,8 @@ oficina_glam/
 │   ├── _layout.tsx          # Root layout
 │   └── global.css           # Estilos globais
 ├── components/              # Componentes reutilizáveis
+│   ├── FloatingChatButton.tsx  # Bolha de chat Leninha (rosto + "Em que posso ajudar?")
+│   ├── SearchModal.tsx         # Modal de pesquisa global (unidades, IA, serviços, etc.)
 ├── lib/
 │   ├── supabase.ts          # Cliente Supabase
 │   └── lembretes.ts         # Lógica de lembretes inteligentes
@@ -81,10 +83,13 @@ oficina_glam/
 
 ### 1️⃣ **Home/Dashboard (index.tsx)**
 #### ✨ Implementado:
-- ✅ Header com perfil e notificações
+- ✅ Header com perfil, **pesquisa global** e notificações
+- ✅ **Ícone de pesquisa** no header (lupa) – abre modal de busca estratégica
 - ✅ Card "Próximo Alerta" com prioridade visual
-- ✅ Card de Assistente IA (discreto e estratégico)
-- ✅ Grid de atalhos (4 cards) navegação rápida
+- ✅ **Central de IAs** (bloco único com fundo accent):
+  - Leninha – chat, perguntas e dúvidas sobre o carro
+  - Verificador de laudos – análise inteligente (integrado na central)
+- ✅ Grid de atalhos (2 cards) navegação rápida (Veículo, Oficinas)
 - ✅ **Carousel de Dicas da Glam:**
   - 3 dicas semanais deslizáveis (swipe horizontal)
   - Cards clicáveis com categorias (Manutenção, Economia, Segurança)
@@ -93,6 +98,18 @@ oficina_glam/
 - ✅ **Seção de Redes Sociais (estratégica/discreta):**
   - Links para Instagram e TikTok (@glamoficina)
   - Botões funcionais com ícones
+
+#### 🔍 Pesquisa global (SearchModal):
+- Modal deslizante com busca em tempo real
+- Categorias: Localização (unidades), IA (Leninha, verificador), Veículo (meu carro, documentos), Serviços (combustível, manutenção), Ajuda (notificações, suporte)
+- Navegação direta para as telas ao selecionar resultado
+- Adaptável iOS e Android (SafeArea, Platform)
+
+#### 🤖 Botão flutuante – Chat Leninha (FloatingChatButton):
+- Bolha de chat com avatar da Leninha (rosto Oficina Glam)
+- Mensagem simpática: "Em que posso ajudar?"
+- Ao tocar, abre o chat em `/ia-module`
+- Posicionado acima da tab bar, adaptável a iOS/Android
 
 #### 📊 Dados:
 - Conecta com Supabase para buscar veículo e última manutenção
@@ -326,12 +343,11 @@ oficina_glam/
 - ✅ **Bottom Tab Navigation:**
   - 5 abas: Veículo, Combustível, Home (centro), Manutenção, Workshops
   - Home centralizada (design único)
-  - Cor de fundo da tab bar: #AC1754 (headerBg - rosa escuro)
-  - Ícones ativos: #F7A8C4 (iconHighlight - rosa claro)
-  - Ícones inativos: #F7A8C4 com opacidade
+  - Tab bar clara/translúcida com ícones PneuIcon, BrilhoIcon, ChavesIcon (design system 2026)
   - Estados ativo/inativo com transição suave
-- ✅ SafeAreaView em todas as telas
-- ✅ **Backgrounds consistentes:** Todas as abas usam #F7A8C4 (colors.rosaClaro)
+- ✅ SafeAreaView e useSafeAreaInsets em todas as telas
+- ✅ **Compatibilidade iOS e Android:** Platform.OS, SafeArea, layout responsivo
+- ✅ **Botão flutuante de chat** (FloatingChatButton) – bolha com Leninha sobre a tab bar
 
 ---
 
@@ -642,7 +658,7 @@ arquivos/
 - **Storage:** Supabase Storage (bucket `laudos/`)
 
 **Design Implementado:**
-- Card premium na Home com shield icon e badge "NOVO"
+- Item dentro da Central de IAs na Home (shield icon, "Verificador de laudos")
 - Tela dedicada com header personalizado
 - Banner informativo sobre funcionamento
 - Botão grande de upload com loading state

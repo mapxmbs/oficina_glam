@@ -141,7 +141,7 @@ export default function ProfileScreen() {
       }
 
       setShowFotoModal(false);
-      Alert.alert("Sucesso", "Foto atualizada! 💕");
+      Alert.alert("Sucesso", "Foto atualizada.");
     } catch (error: any) {
       console.error('Erro no upload:', error);
       Alert.alert("Erro", error.message || "Falha ao enviar foto. Tente novamente.");
@@ -159,7 +159,7 @@ export default function ProfileScreen() {
     }
 
     if (!apelido.trim()) {
-      Alert.alert("Atenção", "Como a IA deve te chamar? Preencha seu apelido! 💕");
+      Alert.alert("Atenção", "Como a IA deve te chamar? Preencha seu apelido.");
       return;
     }
 
@@ -193,7 +193,7 @@ export default function ProfileScreen() {
       
       setIsEditing(false);
       await fetchProfile();
-      Alert.alert("Sucesso", "Perfil atualizado! 💅✨");
+      Alert.alert("Sucesso", "Perfil atualizado.");
     } catch (error: any) {
       console.error('Erro ao salvar:', error);
       Alert.alert("Erro", error.message || "Falha ao salvar perfil. Tente novamente.");
@@ -211,7 +211,7 @@ export default function ProfileScreen() {
           <Text 
             style={{ 
               color: colors.textLight,
-              fontFamily: 'Inter-Regular',
+              fontFamily: 'Inter_400Regular',
               marginTop: 16
             }}
           >
@@ -274,7 +274,7 @@ export default function ProfileScreen() {
 
           <Text 
             style={{ 
-              fontFamily: 'LoveloBlack',
+              fontFamily: 'Inter_700Bold',
               textTransform: 'uppercase'
             }} 
             className="text-white text-3xl font-bold text-center relative z-10"
@@ -282,10 +282,10 @@ export default function ProfileScreen() {
             Meu Perfil
           </Text>
           <Text 
-            style={{ fontFamily: 'Inter-Regular' }} 
+            style={{ fontFamily: 'Inter_400Regular' }} 
             className="text-white opacity-90 text-sm text-center mt-1 relative z-10"
           >
-            Perfil de DIVA 👑
+            Perfil de DIVA
           </Text>
         </View>
 
@@ -362,7 +362,7 @@ export default function ProfileScreen() {
                 <Text 
                   style={{ 
                     color: colors.headerBg,
-                    fontFamily: 'Inter-Regular' 
+                    fontFamily: 'Inter_400Regular' 
                   }} 
                   className="text-sm ml-1"
                 >
@@ -389,10 +389,10 @@ export default function ProfileScreen() {
           >
             <View className="flex-row items-center mb-5">
               <View 
-                style={{ backgroundColor: colors.background }} 
+                style={{ backgroundColor: colors.accentSoft }} 
                 className="w-10 h-10 rounded-full items-center justify-center mr-3"
               >
-                <User size={20} color="white" />
+                <User size={20} color={colors.iconPrimary} />
               </View>
               <Text 
                 style={{ 
@@ -426,7 +426,7 @@ export default function ProfileScreen() {
                     backgroundColor: colors.rosaSuper,
                     borderColor: colors.rosaMedio,
                     color: colors.text,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="p-3 rounded-xl border"
                 />
@@ -438,7 +438,7 @@ export default function ProfileScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-base"
                   >
@@ -457,7 +457,7 @@ export default function ProfileScreen() {
                 }} 
                 className="text-xs uppercase font-bold mb-2"
               >
-                Como gostaria de ser chamada? ✨
+                Como gostaria de ser chamada?
               </Text>
               {isEditing ? (
                 <TextInput
@@ -469,7 +469,7 @@ export default function ProfileScreen() {
                     backgroundColor: colors.rosaSuper,
                     borderColor: colors.rosaMedio,
                     color: colors.text,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="p-3 rounded-xl border"
                 />
@@ -481,7 +481,7 @@ export default function ProfileScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-base"
                   >
@@ -492,11 +492,11 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'Inter-Regular' 
+                  fontFamily: 'Inter_400Regular' 
                 }} 
                 className="text-xs mt-1 italic"
               >
-                💡 A IA e notificações usarão este nome
+                A IA e notificações usarão este nome
               </Text>
             </View>
           </View>
@@ -515,10 +515,10 @@ export default function ProfileScreen() {
           >
             <View className="flex-row items-center mb-5">
               <View 
-                style={{ backgroundColor: colors.background }} 
+                style={{ backgroundColor: colors.accentSoft }} 
                 className="w-10 h-10 rounded-full items-center justify-center mr-3"
               >
-                <Mail size={20} color="white" />
+                <Mail size={20} color={colors.iconPrimary} />
               </View>
               <Text 
                 style={{ 
@@ -554,7 +554,7 @@ export default function ProfileScreen() {
                     backgroundColor: colors.rosaSuper,
                     borderColor: colors.rosaMedio,
                     color: colors.text,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="p-3 rounded-xl border"
                 />
@@ -566,7 +566,7 @@ export default function ProfileScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-base"
                   >
@@ -598,7 +598,7 @@ export default function ProfileScreen() {
                     backgroundColor: colors.rosaSuper,
                     borderColor: colors.rosaMedio,
                     color: colors.text,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="p-3 rounded-xl border"
                 />
@@ -610,7 +610,7 @@ export default function ProfileScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-base"
                   >
@@ -635,10 +635,10 @@ export default function ProfileScreen() {
           >
             <View className="flex-row items-center mb-5">
               <View 
-                style={{ backgroundColor: colors.background }} 
+                style={{ backgroundColor: colors.accentSoft }} 
                 className="w-10 h-10 rounded-full items-center justify-center mr-3"
               >
-                <Crown size={20} color="white" />
+                <Crown size={20} color={colors.iconPrimary} />
               </View>
               <Text 
                 style={{ 
@@ -673,7 +673,7 @@ export default function ProfileScreen() {
                     backgroundColor: colors.rosaSuper,
                     borderColor: colors.rosaMedio,
                     color: colors.text,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="p-3 rounded-xl border"
                 />
@@ -685,7 +685,7 @@ export default function ProfileScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-base"
                   >
@@ -707,11 +707,11 @@ export default function ProfileScreen() {
             <Text 
               style={{ 
                 color: colors.textLight,
-                fontFamily: 'Inter-Regular' 
+                fontFamily: 'Inter_400Regular' 
               }} 
               className="text-xs text-center"
             >
-              🔒 Seus dados estão seguros e protegidos. Em breve: criptografia avançada e autenticação biométrica.
+              Seus dados estão seguros e protegidos. Em breve: criptografia avançada e autenticação biométrica.
             </Text>
           </View>
         </View>
@@ -752,7 +752,7 @@ export default function ProfileScreen() {
                 }}
                 className="font-bold"
               >
-                Escolha sua foto 💕
+                Escolha sua foto
               </Text>
               <TouchableOpacity 
                 onPress={() => setShowFotoModal(false)}
@@ -794,7 +794,7 @@ export default function ProfileScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="text-sm"
                 >
@@ -834,7 +834,7 @@ export default function ProfileScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="text-sm"
                 >

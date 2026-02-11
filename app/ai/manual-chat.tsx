@@ -21,7 +21,7 @@ export default function ManualChatScreen() {
   const [messages, setMessages] = useState<Message[]>([
     { 
       id: '1', 
-      text: 'Olá! Sou sua assistente técnica Glam. 💖\nPosso ler o manual do seu carro. Qual sua dúvida sobre luzes, óleo ou manutenção?', 
+      text: 'Olá! Sou sua assistente técnica Glam.\nPosso ler o manual do seu carro. Qual sua dúvida sobre luzes, óleo ou manutenção?', 
       sender: 'bot' 
     }
   ]);

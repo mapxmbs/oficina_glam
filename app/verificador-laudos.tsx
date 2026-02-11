@@ -111,7 +111,7 @@ export default function VerificadorLaudosScreen() {
   async function uploadPDF() {
     Alert.alert(
       'Upload de PDF',
-      'Funcionalidade em desenvolvimento!\n\nPor enquanto, tire uma foto do documento com a câmera. 📸\n\nEm breve você poderá enviar arquivos PDF diretamente.'
+      'Funcionalidade em desenvolvimento!\n\nPor enquanto, tire uma foto do documento com a câmera.\n\nEm breve você poderá enviar arquivos PDF diretamente.'
     );
     setShowUploadModal(false);
   }
@@ -158,7 +158,7 @@ export default function VerificadorLaudosScreen() {
 
       if (error) throw error;
 
-      Alert.alert('✅ Laudo Analisado!', 'Análise concluída. Confira o resultado abaixo.');
+      Alert.alert('Laudo Analisado', 'Análise concluída. Confira o resultado abaixo.');
       await loadLaudos();
       
       // Abrir detalhes do laudo recém-criado
@@ -196,19 +196,19 @@ export default function VerificadorLaudosScreen() {
         resumo: 'Alguns serviços podem não ser urgentes. Verifique a necessidade.',
         servicos: ['Troca de pastilhas', 'Fluido de freio', 'Balanceamento', 'Limpeza de bicos'],
         alertas: [
-          '⚠️ Balanceamento: Você fez há 3 semanas',
-          '⚠️ Preço acima da média: Limpeza de bicos (R$150 vs média R$90)'
+          'Balanceamento: Você fez há 3 semanas',
+          'Preço acima da média: Limpeza de bicos (R$150 vs média R$90)'
         ]
       },
       {
         status: 'suspeito' as LaudoStatus,
         oficina: oficinas[Math.floor(Math.random() * oficinas.length)],
-        resumo: '🚨 ALERTA! Serviços redundantes detectados. Possível tentativa de fraude.',
+        resumo: 'ALERTA! Serviços redundantes detectados. Possível tentativa de fraude.',
         servicos: ['Alinhamento', 'Troca de pneus', 'Revisão completa', 'Suspensão'],
         alertas: [
-          '🚨 Alinhamento: Feito há 2 semanas (última manutenção)',
-          '🚨 Pneus novos: Instalados há 1 mês',
-          '🚨 Preço muito acima: Revisão (R$800 vs média R$350)'
+          'Alinhamento: Feito há 2 semanas (última manutenção)',
+          'Pneus novos: Instalados há 1 mês',
+          'Preço muito acima: Revisão (R$800 vs média R$350)'
         ]
       }
     ];
@@ -238,7 +238,7 @@ export default function VerificadorLaudosScreen() {
               const { error } = await supabase.from('laudos').delete().eq('id', laudo.id);
               if (error) throw error;
 
-              Alert.alert('✅ Sucesso', 'Laudo removido!');
+              Alert.alert('Sucesso', 'Laudo removido.');
               setSelectedLaudo(null);
               loadLaudos();
             } catch (error: any) {
@@ -269,9 +269,9 @@ export default function VerificadorLaudosScreen() {
 
   const getStatusText = (status: LaudoStatus) => {
     switch (status) {
-      case 'confiavel': return '✅ Confiável';
-      case 'atencao': return '⚠️ Atenção';
-      case 'suspeito': return '🚨 Suspeito';
+      case 'confiavel': return 'Confiável';
+      case 'atencao': return 'Atenção';
+      case 'suspeito': return 'Suspeito';
     }
   };
 
@@ -300,7 +300,7 @@ export default function VerificadorLaudosScreen() {
               <Shield size={24} color="white" />
               <Text 
                 style={{ 
-                  fontFamily: 'LoveloBlack',
+                  fontFamily: 'Inter_700Bold',
                   textTransform: 'uppercase',
                   marginLeft: 8
                 }} 
@@ -310,7 +310,7 @@ export default function VerificadorLaudosScreen() {
               </Text>
             </View>
             <Text 
-              style={{ fontFamily: 'Inter-Regular' }} 
+              style={{ fontFamily: 'Inter_400Regular' }} 
               className="text-white opacity-90 text-xs mt-1"
             >
               Proteção Anti-Golpe
@@ -340,17 +340,17 @@ export default function VerificadorLaudosScreen() {
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium',
+                fontFamily: 'Inter_600SemiBold',
                 fontSize: 16
               }} 
               className="font-bold mb-2"
             >
-              Como funciona? 🛡️
+              Como funciona?
             </Text>
             <Text 
               style={{ 
                 color: colors.text,
-                fontFamily: 'Inter-Regular',
+                fontFamily: 'Inter_400Regular',
                 lineHeight: 20
               }} 
               className="text-sm"
@@ -373,12 +373,12 @@ export default function VerificadorLaudosScreen() {
               <Text 
                 style={{ 
                   color: colors.headerBg,
-                  fontFamily: 'MontserratAlternates-Medium',
+                  fontFamily: 'Inter_600SemiBold',
                   fontSize: 12
                 }}
                 className="font-bold"
               >
-                🤖 IA em breve - Análise mockada por enquanto
+                IA em breve - Análise mockada por enquanto
               </Text>
             </View>
           </View>
@@ -407,7 +407,7 @@ export default function VerificadorLaudosScreen() {
                 <ActivityIndicator size="large" color="white" />
                 <Text 
                   style={{ 
-                    fontFamily: 'MontserratAlternates-Medium',
+                    fontFamily: 'Inter_600SemiBold',
                     marginTop: 16,
                     color: 'white',
                     fontSize: 16,
@@ -418,7 +418,7 @@ export default function VerificadorLaudosScreen() {
                 </Text>
                 <Text 
                   style={{ 
-                    fontFamily: 'Inter-Regular',
+                    fontFamily: 'Inter_400Regular',
                     marginTop: 6,
                     color: 'white',
                     opacity: 0.85,
@@ -445,7 +445,7 @@ export default function VerificadorLaudosScreen() {
                 </View>
                 <Text 
                   style={{ 
-                    fontFamily: 'LoveloBlack',
+                    fontFamily: 'Inter_700Bold',
                     textTransform: 'uppercase',
                     color: 'white',
                     fontSize: 20,
@@ -457,14 +457,14 @@ export default function VerificadorLaudosScreen() {
                 </Text>
                 <Text 
                   style={{ 
-                    fontFamily: 'Inter-Regular',
+                    fontFamily: 'Inter_400Regular',
                     marginTop: 8,
                     color: 'white',
                     opacity: 0.9,
                     fontSize: 14
                   }}
                 >
-                  📸 Foto ou PDF • ⚡ Análise em segundos
+                  Foto ou PDF - Análise em segundos
                 </Text>
               </View>
             )}
@@ -475,12 +475,12 @@ export default function VerificadorLaudosScreen() {
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'LoveloBlack',
+                fontFamily: 'Inter_700Bold',
                 textTransform: 'uppercase'
               }} 
               className="text-lg font-bold mb-3"
             >
-              📋 Histórico de Análises
+              Histórico de Análises
             </Text>
           </View>
 
@@ -493,7 +493,7 @@ export default function VerificadorLaudosScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium',
+                  fontFamily: 'Inter_600SemiBold',
                   marginTop: 16
                 }} 
                 className="text-center"
@@ -503,7 +503,7 @@ export default function VerificadorLaudosScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'Inter-Regular',
+                  fontFamily: 'Inter_400Regular',
                   marginTop: 8
                 }} 
                 className="text-center text-sm"
@@ -537,7 +537,7 @@ export default function VerificadorLaudosScreen() {
                       <Text 
                         style={{ 
                           color: colors.rosaEscuro,
-                          fontFamily: 'MontserratAlternates-Medium',
+                          fontFamily: 'Inter_600SemiBold',
                           fontSize: 17
                         }} 
                         className="font-bold mb-1"
@@ -552,7 +552,7 @@ export default function VerificadorLaudosScreen() {
                         <Text 
                           style={{ 
                             color: getStatusColor(laudo.status),
-                            fontFamily: 'MontserratAlternates-Medium',
+                            fontFamily: 'Inter_600SemiBold',
                             marginLeft: 6,
                             fontSize: 13
                           }} 
@@ -579,22 +579,22 @@ export default function VerificadorLaudosScreen() {
                         <Text 
                           style={{ 
                             color: colors.textLight,
-                            fontFamily: 'Inter-Regular',
+                            fontFamily: 'Inter_400Regular',
                             fontSize: 12
                           }}
                         >
-                          📍 {laudo.oficina_nome || 'Oficina não identificada'}
+                          {laudo.oficina_nome || 'Oficina não identificada'}
                         </Text>
                       </View>
                       <Text 
                         style={{ 
                           color: colors.textLight,
-                          fontFamily: 'Inter-Regular',
+                          fontFamily: 'Inter_400Regular',
                           fontSize: 12,
                           marginLeft: 8
                         }}
                       >
-                        📅 {new Date(laudo.created_at).toLocaleDateString('pt-BR')}
+                        {new Date(laudo.created_at).toLocaleDateString('pt-BR')}
                       </Text>
                     </View>
                   </View>
@@ -602,7 +602,7 @@ export default function VerificadorLaudosScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'Inter-Regular',
+                      fontFamily: 'Inter_400Regular',
                       lineHeight: 20
                     }} 
                     className="text-sm mb-3"
@@ -614,7 +614,7 @@ export default function VerificadorLaudosScreen() {
                   <Text 
                     style={{ 
                       color: colors.headerBg,
-                      fontFamily: 'MontserratAlternates-Medium',
+                      fontFamily: 'Inter_600SemiBold',
                       fontSize: 13
                     }} 
                     className="font-bold"
@@ -651,18 +651,18 @@ export default function VerificadorLaudosScreen() {
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium',
+                fontFamily: 'Inter_600SemiBold',
                 fontSize: 20,
                 marginBottom: 4
               }}
               className="font-bold"
             >
-              Escolha como enviar 📄
+              Escolha como enviar
             </Text>
             <Text 
               style={{ 
                 color: colors.textLight,
-                fontFamily: 'Inter-Regular',
+                fontFamily: 'Inter_400Regular',
                 marginBottom: 24
               }}
               className="text-sm"
@@ -694,7 +694,7 @@ export default function VerificadorLaudosScreen() {
                 <Text 
                   style={{ 
                     color: colors.text,
-                    fontFamily: 'MontserratAlternates-Medium'
+                    fontFamily: 'Inter_600SemiBold'
                   }}
                   className="font-bold text-base"
                 >
@@ -703,7 +703,7 @@ export default function VerificadorLaudosScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="text-sm"
                 >
@@ -736,7 +736,7 @@ export default function VerificadorLaudosScreen() {
                 <Text 
                   style={{ 
                     color: colors.text,
-                    fontFamily: 'MontserratAlternates-Medium'
+                    fontFamily: 'Inter_600SemiBold'
                   }}
                   className="font-bold text-base"
                 >
@@ -745,7 +745,7 @@ export default function VerificadorLaudosScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="text-sm"
                 >
@@ -775,7 +775,7 @@ export default function VerificadorLaudosScreen() {
                 <Text 
                   style={{ 
                     color: colors.text,
-                    fontFamily: 'MontserratAlternates-Medium'
+                    fontFamily: 'Inter_600SemiBold'
                   }}
                   className="font-bold text-base"
                 >
@@ -784,7 +784,7 @@ export default function VerificadorLaudosScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="text-sm"
                 >
@@ -807,7 +807,7 @@ export default function VerificadorLaudosScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium',
+                  fontFamily: 'Inter_600SemiBold',
                   textAlign: 'center'
                 }}
                 className="font-bold"
@@ -842,7 +842,7 @@ export default function VerificadorLaudosScreen() {
                 
                 <Text 
                   style={{ 
-                    fontFamily: 'LoveloBlack',
+                    fontFamily: 'Inter_700Bold',
                     textTransform: 'uppercase'
                   }} 
                   className="text-white text-lg font-bold"
@@ -890,7 +890,7 @@ export default function VerificadorLaudosScreen() {
                         <Text 
                           style={{ 
                             color: getStatusColor(selectedLaudo.status),
-                            fontFamily: 'LoveloBlack',
+                            fontFamily: 'Inter_700Bold',
                             textTransform: 'uppercase',
                             fontSize: 24
                           }} 
@@ -901,7 +901,7 @@ export default function VerificadorLaudosScreen() {
                         <Text 
                           style={{ 
                             color: colors.text,
-                            fontFamily: 'Inter-Regular',
+                            fontFamily: 'Inter_400Regular',
                             textAlign: 'center',
                             lineHeight: 22
                           }} 
@@ -940,12 +940,12 @@ export default function VerificadorLaudosScreen() {
                   <Text 
                     style={{ 
                       color: colors.rosaEscuro,
-                      fontFamily: 'MontserratAlternates-Medium',
+                      fontFamily: 'Inter_600SemiBold',
                       fontSize: 18
                     }} 
                     className="font-bold mb-4"
                   >
-                    🔧 Serviços Identificados
+                    Serviços Identificados
                   </Text>
                   {selectedLaudo.servicos_identificados.map((servico, idx) => (
                     <View 
@@ -968,7 +968,7 @@ export default function VerificadorLaudosScreen() {
                       <Text 
                         style={{ 
                           color: colors.text,
-                          fontFamily: 'Inter-Regular'
+                          fontFamily: 'Inter_400Regular'
                         }}
                         className="flex-1"
                       >
@@ -991,12 +991,12 @@ export default function VerificadorLaudosScreen() {
                     <Text 
                       style={{ 
                         color: colors.rosaEscuro,
-                        fontFamily: 'MontserratAlternates-Medium',
+                        fontFamily: 'Inter_600SemiBold',
                         fontSize: 18
                       }} 
                       className="font-bold mb-4"
                     >
-                      ⚠️ Alertas Detectados
+                      Alertas Detectados
                     </Text>
                     {selectedLaudo.alertas.map((alerta, idx) => (
                       <View 
@@ -1010,7 +1010,7 @@ export default function VerificadorLaudosScreen() {
                         <Text 
                           style={{ 
                             color: colors.text,
-                            fontFamily: 'Inter-Regular',
+                            fontFamily: 'Inter_400Regular',
                             lineHeight: 20
                           }}
                         >
@@ -1028,33 +1028,33 @@ export default function VerificadorLaudosScreen() {
                 >
                   <Text 
                     style={{ 
-                      fontFamily: 'MontserratAlternates-Medium',
+                      fontFamily: 'Inter_600SemiBold',
                       fontSize: 18
                     }} 
                     className="text-white font-bold mb-3"
                   >
-                    💡 Recomendações
+                    Recomendações
                   </Text>
                   {selectedLaudo.status === 'confiavel' ? (
                     <Text 
-                      style={{ fontFamily: 'Inter-Regular', lineHeight: 22 }} 
+                      style={{ fontFamily: 'Inter_400Regular', lineHeight: 22 }} 
                       className="text-white"
                     >
-                      Orçamento parece justo e serviços necessários. Você pode prosseguir com segurança! ✅
+                      Orçamento parece justo e serviços necessários. Você pode prosseguir com segurança.
                     </Text>
                   ) : selectedLaudo.status === 'atencao' ? (
                     <Text 
-                      style={{ fontFamily: 'Inter-Regular', lineHeight: 22 }} 
+                      style={{ fontFamily: 'Inter_400Regular', lineHeight: 22 }} 
                       className="text-white"
                     >
-                      Recomendamos questionar alguns serviços com a oficina ou buscar uma segunda opinião em uma oficina da Rede Glam. ⚠️
+                      Recomendamos questionar alguns serviços com a oficina ou buscar uma segunda opinião em uma oficina da Rede Glam.
                     </Text>
                   ) : (
                     <Text 
-                      style={{ fontFamily: 'Inter-Regular', lineHeight: 22 }} 
+                      style={{ fontFamily: 'Inter_400Regular', lineHeight: 22 }} 
                       className="text-white"
                     >
-                      🚨 CUIDADO! Este orçamento apresenta sinais de fraude. Não autorize os serviços. Busque uma oficina confiável da Rede Glam imediatamente.
+                      CUIDADO! Este orçamento apresenta sinais de fraude. Não autorize os serviços. Busque uma oficina confiável da Rede Glam imediatamente.
                     </Text>
                   )}
 
@@ -1074,7 +1074,7 @@ export default function VerificadorLaudosScreen() {
                       <Text 
                         style={{ 
                           color: colors.headerBg,
-                          fontFamily: 'MontserratAlternates-Medium'
+                          fontFamily: 'Inter_600SemiBold'
                         }}
                         className="font-bold"
                       >
@@ -1089,7 +1089,7 @@ export default function VerificadorLaudosScreen() {
                   <Text 
                     style={{ 
                       color: colors.textLight,
-                      fontFamily: 'Inter-Regular'
+                      fontFamily: 'Inter_400Regular'
                     }}
                     className="text-xs"
                   >

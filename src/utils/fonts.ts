@@ -1,34 +1,28 @@
-// Utilitário para garantir fontes consistentes entre iOS e Android
+/**
+ * Fontes – Inter única (regra absoluta)
+ * Variação por peso e tamanho.
+ */
 
 export const fonts = {
-  // Títulos grandes e chamadas principais
   heading: {
-    fontFamily: 'LoveloBlack',
-    textTransform: 'uppercase' as const,
+    fontFamily: 'Inter_700Bold',
+    fontSize: 20,
   },
-  
-  // Subtítulos e labels
   subheading: {
-    fontFamily: 'MontserratAlternates-Medium',
+    fontFamily: 'Inter_500Medium',
+    fontSize: 16,
   },
-  
-  // Texto corpo e parágrafos
   body: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
+    fontSize: 15,
   },
-  
-  // Texto de botões
   button: {
-    fontFamily: 'MontserratAlternates-Medium',
-    fontWeight: 'bold' as const,
+    fontFamily: 'Inter_600SemiBold',
   },
-  
-  // Labels e captions
   caption: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 12,
   },
-};
+} as const;
 
-// Helper para aplicar fonte de forma consistente
 export const getFontStyle = (type: keyof typeof fonts) => fonts[type];

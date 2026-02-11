@@ -1,5 +1,6 @@
-import { Bot, Clock, DollarSign, Filter, HelpCircle, Image as ImageIcon, Mail, Map, MapPin, MessageCircle, MessageSquare, Phone, Search, Star } from 'lucide-react-native';
-import { useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Bot, Clock, DollarSign, Filter, Heart, HelpCircle, Image as ImageIcon, Mail, Map, MapPin, MessageCircle, MessageSquare, Phone, Search, Star, X } from 'lucide-react-native';
+import { useCallback, useEffect, useState } from 'react';
 import { Image, Linking, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../src/theme/colors';
@@ -72,33 +73,69 @@ const WORKSHOPS = [
   }
 ];
 
+const FAVORITES_KEY = '@glam_workshop_favorites';
+const LAST_USED_KEY = '@glam_last_workshop';
+
 export default function WorkshopsScreen() {
   const [filter, setFilter] = useState('todos');
   const [searchCity, setSearchCity] = useState('');
   const [selectedUF, setSelectedUF] = useState('Todos');
   const [showSAC, setShowSAC] = useState(false);
-  const [vehicleData, setVehicleData] = useState({ modelo: 'Honda Civic', placa: 'ABC-1234' }); // Mock - virá do banco
+  const [favorites, setFavorites] = useState<number[]>([]);
+  const [lastUsedId, setLastUsedId] = useState<number | null>(null);
+  const [vehicleData, setVehicleData] = useState({ modelo: 'Honda Civic', placa: 'ABC-1234' });
 
-  const openWhatsApp = (phone: string, workshopName: string) => {
+  const loadFavorites = useCallback(async () => {
+    try {
+      const s = await AsyncStorage.getItem(FAVORITES_KEY);
+      if (s) setFavorites(JSON.parse(s));
+    } catch (_) {}
+  }, []);
+
+  const loadLastUsed = useCallback(async () => {
+    try {
+      const s = await AsyncStorage.getItem(LAST_USED_KEY);
+      if (s) setLastUsedId(parseInt(s, 10));
+    } catch (_) {}
+  }, []);
+
+  useEffect(() => { loadFavorites(); loadLastUsed(); }, [loadFavorites, loadLastUsed]);
+
+  const toggleFavorite = async (id: number) => {
+    const next = favorites.includes(id) ? favorites.filter((f) => f !== id) : [...favorites, id];
+    setFavorites(next);
+    try {
+      await AsyncStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
+    } catch (_) {}
+  };
+
+  const saveLastUsed = async (id: number) => {
+    setLastUsedId(id);
+    try {
+      await AsyncStorage.setItem(LAST_USED_KEY, String(id));
+    } catch (_) {}
+  };
+
+  const openWhatsApp = (phone: string, workshopName: string, workshopId: number) => {
+    saveLastUsed(workshopId);
     const message = encodeURIComponent(
-      `Olá! Encontrei sua oficina pelo app Oficina Glam e quero agendar um serviço para meu carro ${vehicleData.modelo} (${vehicleData.placa}). 🚗`
+      `Olá! Encontrei sua oficina pelo app Oficina Glam e quero agendar um serviço para meu carro ${vehicleData.modelo} (${vehicleData.placa}).`
     );
     Linking.openURL(`https://wa.me/${phone}?text=${message}`);
   };
 
   const openSACWhatsApp = () => {
-    const message = encodeURIComponent('Olá, equipe Glam! Preciso de ajuda com o app. 💕');
+    const message = encodeURIComponent('Olá, equipe Glam! Preciso de ajuda com o app.');
     Linking.openURL(`https://wa.me/551199999999?text=${message}`); // Número SAC Glam (mock)
   };
 
-  // Lógica de Filtragem
   const filteredWorkshops = WORKSHOPS.filter(w => {
     let matchesFilter = true;
     let matchesCity = true;
     let matchesUF = true;
 
-    // Filtro por categoria
-    if (filter === '5estrelas') matchesFilter = w.rating === 5.0;
+    if (filter === 'favoritas') matchesFilter = favorites.includes(w.id);
+    else if (filter === '5estrelas') matchesFilter = w.rating === 5.0;
     else if (filter === 'especializada') matchesFilter = w.category === 'especializada';
     else if (filter !== 'todos') matchesFilter = false;
 
@@ -139,7 +176,7 @@ export default function WorkshopsScreen() {
           <View className="relative z-10">
             <Text 
               style={{ 
-                fontFamily: 'LoveloBlack',
+                fontFamily: 'Inter_700Bold',
                 textTransform: 'uppercase'
               }} 
               className="text-white text-3xl font-bold mb-1"
@@ -147,10 +184,10 @@ export default function WorkshopsScreen() {
               Rede Glam
             </Text>
             <Text 
-              style={{ fontFamily: 'Inter-Regular' }} 
+              style={{ fontFamily: 'Inter_400Regular' }} 
               className="text-white opacity-90 text-sm mb-4"
             >
-              Oficinas verificadas e seguras para DIVAs 💅
+              Oficinas verificadas e seguras
             </Text>
 
             {/* Botão SAC Estratégico */}
@@ -160,10 +197,10 @@ export default function WorkshopsScreen() {
               className="flex-row items-center justify-center p-3 rounded-xl"
               activeOpacity={0.8}
             >
-              <MessageSquare size={18} color="white" />
+              <MessageSquare size={18} color={colors.iconPrimary} />
               <Text 
-                style={{ fontFamily: 'MontserratAlternates-Medium' }}
-                className="text-white font-bold ml-2"
+                style={{ color: colors.iconPrimary, fontFamily: 'Inter_600SemiBold' }}
+                className="font-bold ml-2"
               >
                 SAC Glam - Fale Conosco
               </Text>
@@ -183,22 +220,16 @@ export default function WorkshopsScreen() {
             <Map size={20} color={colors.headerBg} />
             <View className="flex-1 ml-3">
               <Text 
-                style={{ 
-                  color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium' 
-                }} 
+                style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} 
                 className="font-bold text-sm mb-1"
               >
-                🗺️ Em breve: Mapa Interativo
+                Em breve: Mapa e Proximidade
               </Text>
               <Text 
-                style={{ 
-                  color: colors.textLight,
-                  fontFamily: 'Inter-Regular' 
-                }} 
+                style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
                 className="text-xs"
               >
-                Visualize as oficinas no mapa do Brasil e encontre a mais próxima de você!
+                Mapa interativo e notificação por proximidade (com sua permissão).
               </Text>
             </View>
           </View>
@@ -221,7 +252,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="font-bold text-base ml-2"
             >
@@ -234,7 +265,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.textLight,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="text-xs uppercase font-bold mb-2"
             >
@@ -257,7 +288,7 @@ export default function WorkshopsScreen() {
                   flex: 1,
                   marginLeft: 8,
                   color: colors.text,
-                  fontFamily: 'Inter-Regular'
+                  fontFamily: 'Inter_400Regular'
                 }}
               />
             </View>
@@ -268,7 +299,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.textLight,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="text-xs uppercase font-bold mb-2"
             >
@@ -280,15 +311,15 @@ export default function WorkshopsScreen() {
                   key={uf}
                   onPress={() => setSelectedUF(uf)}
                   style={{ 
-                    backgroundColor: selectedUF === uf ? colors.rosaClaro : colors.surface,
-                    borderColor: selectedUF === uf ? colors.rosaClaro : colors.rosaMedio
+                    backgroundColor: selectedUF === uf ? colors.accentSoft : colors.surface,
+                    borderColor: selectedUF === uf ? colors.accentSoft : colors.rosaMedio
                   }}
                   className="px-4 py-2 rounded-full mr-2 border"
                 >
                   <Text 
                     style={{ 
-                      color: selectedUF === uf ? 'white' : colors.text,
-                      fontFamily: 'MontserratAlternates-Medium' 
+                      color: selectedUF === uf ? colors.iconPrimary : colors.text,
+                      fontFamily: 'Inter_600SemiBold' 
                     }}
                     className="font-bold text-sm"
                   >
@@ -304,7 +335,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.textLight,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="text-xs uppercase font-bold mb-2"
             >
@@ -314,16 +345,13 @@ export default function WorkshopsScreen() {
               <TouchableOpacity 
                 onPress={() => setFilter('todos')}
                 style={{ 
-                  backgroundColor: filter === 'todos' ? colors.rosaClaro : colors.surface,
-                  borderColor: filter === 'todos' ? colors.rosaClaro : colors.rosaMedio
+                  backgroundColor: filter === 'todos' ? colors.accentSoft : colors.surface,
+                  borderColor: filter === 'todos' ? colors.accentSoft : colors.rosaMedio
                 }}
                 className="px-4 py-2 rounded-full mr-2 border"
               >
                 <Text 
-                  style={{ 
-                    color: filter === 'todos' ? 'white' : colors.text,
-                    fontFamily: 'MontserratAlternates-Medium' 
-                  }}
+                  style={{ color: filter === 'todos' ? colors.iconPrimary : colors.text, fontFamily: 'Inter_600SemiBold' }}
                   className="font-bold text-sm"
                 >
                   Todas
@@ -331,36 +359,53 @@ export default function WorkshopsScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity 
+                onPress={() => setFilter('favoritas')}
+                style={{ 
+                  backgroundColor: filter === 'favoritas' ? colors.accentSoft : colors.surface,
+                  borderColor: filter === 'favoritas' ? colors.accentSoft : colors.rosaMedio
+                }}
+                className="px-4 py-2 rounded-full mr-2 border flex-row items-center"
+              >
+                <Heart size={14} color={filter === 'favoritas' ? colors.iconPrimary : colors.text} fill={filter === 'favoritas' ? colors.iconPrimary : 'transparent'} />
+                <Text 
+                  style={{ color: filter === 'favoritas' ? colors.iconPrimary : colors.text, fontFamily: 'Inter_600SemiBold', marginLeft: 4 }}
+                  className="font-bold text-sm"
+                >
+                  Favoritas
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
                 onPress={() => setFilter('5estrelas')}
                 style={{ 
-                  backgroundColor: filter === '5estrelas' ? colors.rosaClaro : colors.surface,
-                  borderColor: filter === '5estrelas' ? colors.rosaClaro : colors.rosaMedio
+                  backgroundColor: filter === '5estrelas' ? colors.accentSoft : colors.surface,
+                  borderColor: filter === '5estrelas' ? colors.accentSoft : colors.rosaMedio
                 }}
                 className="px-4 py-2 rounded-full mr-2 border"
               >
                 <Text 
                   style={{ 
-                    color: filter === '5estrelas' ? 'white' : colors.text,
-                    fontFamily: 'MontserratAlternates-Medium' 
+                    color: filter === '5estrelas' ? colors.iconPrimary : colors.text,
+                    fontFamily: 'Inter_600SemiBold' 
                   }}
                   className="font-bold text-sm"
                 >
-                  ⭐ 5 Estrelas
+                  5 Estrelas
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
                 onPress={() => setFilter('especializada')}
                 style={{ 
-                  backgroundColor: filter === 'especializada' ? colors.rosaClaro : colors.surface,
-                  borderColor: filter === 'especializada' ? colors.rosaClaro : colors.rosaMedio
+                  backgroundColor: filter === 'especializada' ? colors.accentSoft : colors.surface,
+                  borderColor: filter === 'especializada' ? colors.accentSoft : colors.rosaMedio
                 }}
                 className="px-4 py-2 rounded-full mr-2 border"
               >
                 <Text 
                   style={{ 
-                    color: filter === 'especializada' ? 'white' : colors.text,
-                    fontFamily: 'MontserratAlternates-Medium' 
+                    color: filter === 'especializada' ? colors.iconPrimary : colors.text,
+                    fontFamily: 'Inter_600SemiBold' 
                   }}
                   className="font-bold text-sm"
                 >
@@ -371,12 +416,19 @@ export default function WorkshopsScreen() {
           </View>
         </View>
 
+        {/* Sugestão última loja */}
+        {lastUsedId && WORKSHOPS.find((w) => w.id === lastUsedId) && (
+          <View style={{ backgroundColor: colors.accentSoft, padding: 12, borderRadius: 12, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
+            <MapPin size={18} color={colors.iconPrimary} />
+            <Text style={{ color: colors.textSecondary, fontFamily: 'Inter_400Regular', fontSize: 12, marginLeft: 8, flex: 1 }}>
+              Última loja usada: {WORKSHOPS.find((w) => w.id === lastUsedId)?.name}
+            </Text>
+          </View>
+        )}
+
         {/* CONTADOR DE RESULTADOS */}
         <Text 
-          style={{ 
-            color: colors.textLight,
-            fontFamily: 'Inter-Regular' 
-          }} 
+          style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
           className="text-sm mb-4 ml-1"
         >
           {filteredWorkshops.length} oficina{filteredWorkshops.length !== 1 ? 's' : ''} encontrada{filteredWorkshops.length !== 1 ? 's' : ''}
@@ -392,7 +444,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.text,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="font-bold text-base mt-4 text-center"
             >
@@ -401,7 +453,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.textLight,
-                fontFamily: 'Inter-Regular' 
+                fontFamily: 'Inter_400Regular' 
               }} 
               className="text-sm mt-2 text-center"
             >
@@ -430,6 +482,14 @@ export default function WorkshopsScreen() {
                   resizeMode="cover"
                 />
                 
+                {/* Botão Favoritar */}
+                <TouchableOpacity
+                  onPress={() => toggleFavorite(item.id)}
+                  style={{ backgroundColor: 'rgba(255,255,255,0.9)', width: 36, height: 36, borderRadius: 18, position: 'absolute', top: 12, left: 12, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <Heart size={18} color={favorites.includes(item.id) ? colors.accent : colors.textSecondary} fill={favorites.includes(item.id) ? colors.accent : 'transparent'} />
+                </TouchableOpacity>
+
                 {/* Badge de Avaliação */}
                 <View 
                   style={{ backgroundColor: colors.warning }}
@@ -437,7 +497,7 @@ export default function WorkshopsScreen() {
                 >
                   <Star size={14} color="white" fill="white" />
                   <Text 
-                    style={{ fontFamily: 'MontserratAlternates-Medium' }}
+                    style={{ fontFamily: 'Inter_600SemiBold' }}
                     className="text-white text-sm font-bold ml-1"
                   >
                     {item.rating}
@@ -451,7 +511,7 @@ export default function WorkshopsScreen() {
                 >
                   <ImageIcon size={12} color="white" />
                   <Text 
-                    style={{ fontFamily: 'Inter-Regular' }}
+                    style={{ fontFamily: 'Inter_400Regular' }}
                     className="text-white text-xs ml-1"
                   >
                     +3 fotos (em breve)
@@ -464,7 +524,7 @@ export default function WorkshopsScreen() {
                 <Text 
                   style={{ 
                     color: colors.rosaEscuro,
-                    fontFamily: 'LoveloBlack',
+                    fontFamily: 'Inter_700Bold',
                     textTransform: 'uppercase' 
                   }} 
                   className="text-xl font-bold mb-2"
@@ -478,7 +538,7 @@ export default function WorkshopsScreen() {
                   <Text 
                     style={{ 
                       color: colors.textLight,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-sm ml-2 flex-1"
                   >
@@ -492,7 +552,7 @@ export default function WorkshopsScreen() {
                   <Text 
                     style={{ 
                       color: colors.textLight,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-sm ml-2"
                   >
@@ -506,7 +566,7 @@ export default function WorkshopsScreen() {
                   <Text 
                     style={{ 
                       color: colors.text,
-                      fontFamily: 'MontserratAlternates-Medium' 
+                      fontFamily: 'Inter_600SemiBold' 
                     }} 
                     className="text-sm ml-2 font-bold"
                   >
@@ -525,7 +585,7 @@ export default function WorkshopsScreen() {
                       <Text 
                         style={{ 
                           color: colors.rosaInteso,
-                          fontFamily: 'Inter-Regular' 
+                          fontFamily: 'Inter_400Regular' 
                         }} 
                         className="text-xs"
                       >
@@ -543,11 +603,11 @@ export default function WorkshopsScreen() {
                   <Text 
                     style={{ 
                       color: colors.textLight,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-xs text-center"
                   >
-                    ⭐ {item.reviews} avaliações de DIVAs
+                    {item.reviews} avaliações de DIVAs
                   </Text>
                 </View>
 
@@ -564,12 +624,12 @@ export default function WorkshopsScreen() {
                       elevation: 4
                     }}
                     className="flex-row items-center justify-center p-4 rounded-xl"
-                    onPress={() => openWhatsApp(item.whatsapp, item.name)}
+                    onPress={() => openWhatsApp(item.whatsapp, item.name, item.id)}
                     activeOpacity={0.8}
                   >
                     <MessageCircle size={20} color="white" />
                     <Text 
-                      style={{ fontFamily: 'MontserratAlternates-Medium' }}
+                      style={{ fontFamily: 'Inter_600SemiBold' }}
                       className="text-white font-bold ml-2 text-base"
                     >
                       Quero Agendar via WhatsApp
@@ -591,7 +651,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.headerBg,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }}
                       className="font-bold ml-2"
                     >
@@ -636,7 +696,7 @@ export default function WorkshopsScreen() {
                   <Text 
                     style={{ 
                       color: colors.rosaEscuro,
-                      fontFamily: 'LoveloBlack',
+                      fontFamily: 'Inter_700Bold',
                       textTransform: 'uppercase' 
                     }} 
                     className="text-xl font-bold"
@@ -646,11 +706,11 @@ export default function WorkshopsScreen() {
                   <Text 
                     style={{ 
                       color: colors.textLight,
-                      fontFamily: 'Inter-Regular' 
+                      fontFamily: 'Inter_400Regular' 
                     }} 
                     className="text-xs"
                   >
-                    Como podemos te ajudar? 💕
+                    Como podemos te ajudar?
                   </Text>
                 </View>
               </View>
@@ -659,7 +719,7 @@ export default function WorkshopsScreen() {
                 style={{ backgroundColor: colors.rosaSuper }}
                 className="w-10 h-10 rounded-full items-center justify-center"
               >
-                <Text style={{ color: colors.rosaInteso }}>✕</Text>
+                <X size={20} color={colors.accent} strokeWidth={2} />
               </TouchableOpacity>
             </View>
 
@@ -667,7 +727,7 @@ export default function WorkshopsScreen() {
             <Text 
               style={{ 
                 color: colors.text,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="font-bold text-base mb-4"
             >
@@ -693,13 +753,13 @@ export default function WorkshopsScreen() {
                   <MessageCircle size={24} color="white" />
                   <View className="flex-1 ml-3">
                     <Text 
-                      style={{ fontFamily: 'MontserratAlternates-Medium' }}
+                      style={{ fontFamily: 'Inter_600SemiBold' }}
                       className="text-white font-bold text-base"
                     >
                       WhatsApp Glam
                     </Text>
                     <Text 
-                      style={{ fontFamily: 'Inter-Regular' }}
+                      style={{ fontFamily: 'Inter_400Regular' }}
                       className="text-white opacity-90 text-xs"
                     >
                       Atendimento rápido e direto
@@ -723,7 +783,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }}
                       className="font-bold text-base"
                     >
@@ -732,11 +792,11 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.textLight,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }}
                       className="text-xs"
                     >
-                      🚧 Em breve - Chat ao vivo
+                      Em breve - Chat ao vivo
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -757,7 +817,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }}
                       className="font-bold text-base"
                     >
@@ -766,7 +826,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.textLight,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }}
                       className="text-xs"
                     >
@@ -791,7 +851,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }}
                       className="font-bold text-base"
                     >
@@ -800,7 +860,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.textLight,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }}
                       className="text-xs"
                     >
@@ -814,7 +874,7 @@ export default function WorkshopsScreen() {
               <Text 
                 style={{ 
                   color: colors.text,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_600SemiBold' 
                 }} 
                 className="font-bold text-base mb-4"
               >
@@ -836,7 +896,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }}
                       className="font-bold text-base"
                     >
@@ -845,11 +905,11 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.textLight,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }}
                       className="text-xs"
                     >
-                      🚧 Em breve - Perguntas frequentes
+                      Em breve - Perguntas frequentes
                     </Text>
                   </View>
                 </View>
@@ -868,7 +928,7 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'MontserratAlternates-Medium' 
+                        fontFamily: 'Inter_600SemiBold' 
                       }}
                       className="font-bold text-base"
                     >
@@ -877,11 +937,11 @@ export default function WorkshopsScreen() {
                     <Text 
                       style={{ 
                         color: colors.textLight,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }}
                       className="text-xs"
                     >
-                      🚧 Em breve - IA com base de conhecimento Glam
+                      Em breve - IA com base de conhecimento Glam
                     </Text>
                   </View>
                 </View>
@@ -895,11 +955,11 @@ export default function WorkshopsScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular' 
+                    fontFamily: 'Inter_400Regular' 
                   }}
                   className="text-xs text-center"
                 >
-                  💡 Estamos trabalhando para trazer mais funcionalidades de atendimento em breve!
+                  Estamos trabalhando para trazer mais funcionalidades de atendimento em breve.
                 </Text>
               </View>
             </ScrollView>

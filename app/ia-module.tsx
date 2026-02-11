@@ -19,7 +19,7 @@ export default function IAModuleScreen() {
             onPress={() => router.back()}
             style={{ marginRight: 12, padding: 8 }}
           >
-            <Text style={{ color: colors.headerBg, fontFamily: 'Inter-Regular' }} className="text-base">Voltar</Text>
+            <Text style={{ color: colors.headerBg, fontFamily: 'Inter_400Regular' }} className="text-base">Voltar</Text>
           </TouchableOpacity>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
             <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.rosaClaro, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
@@ -27,9 +27,9 @@ export default function IAModuleScreen() {
             </View>
             <View>
               <Text style={{ color: colors.rosaEscuro, fontFamily: 'LoveloBlack', textTransform: 'uppercase' }} className="text-xl font-bold">
-                Assistente Glam
+                Assistente Leninha
               </Text>
-              <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} className="text-sm">
+              <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm">
                 Verificador, Leninha e dúvidas
               </Text>
             </View>
@@ -37,7 +37,7 @@ export default function IAModuleScreen() {
         </View>
 
         <View style={{ backgroundColor: colors.cardBg, borderWidth: 1, borderColor: colors.rosaMedio, borderRadius: 16, padding: 4, marginBottom: 16 }}>
-          <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} className="text-xs px-2 py-1">
+          <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-xs px-2 py-1">
             Escolha uma opção abaixo. Em breve: respostas com IA usando o manual do seu carro e histórico.
           </Text>
         </View>
@@ -65,10 +65,10 @@ export default function IAModuleScreen() {
             <FileCheck size={26} color={colors.iconOnAccent} strokeWidth={2} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.rosaEscuro, fontFamily: 'MontserratAlternates-Medium' }} className="text-lg font-bold">
+            <Text style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} className="text-lg font-bold">
               Verificador de Laudos
             </Text>
-            <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} className="text-sm mt-1">
+            <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm mt-1">
               Analise orçamentos e laudos antes de autorizar serviços
             </Text>
           </View>
@@ -97,10 +97,10 @@ export default function IAModuleScreen() {
             <MessageCircle size={26} color={colors.iconPrimary} strokeWidth={2} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.rosaEscuro, fontFamily: 'MontserratAlternates-Medium' }} className="text-lg font-bold">
+            <Text style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} className="text-lg font-bold">
               Leninha
             </Text>
-            <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} className="text-sm mt-1">
+            <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm mt-1">
               Assistente IA da Oficina Glam – tire dúvidas sobre o seu carro
             </Text>
           </View>
@@ -128,10 +128,10 @@ export default function IAModuleScreen() {
             <ChavesIcon size={26} color={colors.iconPrimary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.rosaEscuro, fontFamily: 'MontserratAlternates-Medium' }} className="text-lg font-bold">
+            <Text style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} className="text-lg font-bold">
               Dúvidas sobre orçamentos
             </Text>
-            <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular' }} className="text-sm mt-1">
+            <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm mt-1">
               Manual do carro e histórico para orientar em serviços mecânicos
             </Text>
           </View>

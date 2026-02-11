@@ -1,23 +1,27 @@
 /**
- * Padrões de UI – Oficina Glam
- *
- * REGRA ANTI-EXCESSO: Nenhum card usa simultaneamente
- * fundo colorido + borda colorida + sombra.
- *
- * Accent apenas em: CTA principal, estado ativo, badges importantes, ícones-chave.
+ * Padrões de UI – Oficina Glam | Premium, Glam, Contraste Real
+ * Planos claros, médios e escuros. Beterraba com presença. Menos bordas, mais planos.
  */
 
 import { colors } from './colors';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ELEVAÇÃO (use UMA por card: sombra OU borda)
+// TELA – plano médio (background), contraste com surface branca
+// ═══════════════════════════════════════════════════════════════════════════
+export const screenNeutral = {
+  flex: 1,
+  backgroundColor: colors.background,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CARDS – branco puro, sem bordas excessivas. Contraste por fundo e espaçamento.
 // ═══════════════════════════════════════════════════════════════════════════
 export const cardShadow = {
   shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.06,
-  shadowRadius: 8,
-  elevation: 2,
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.04,
+  shadowRadius: 6,
+  elevation: 1,
 };
 
 export const cardBorder = {
@@ -25,49 +29,50 @@ export const cardBorder = {
   borderColor: colors.border,
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// EXEMPLOS DE CARDS
-// ═══════════════════════════════════════════════════════════════════════════
-
-/** 1. TELA NEUTRA – Fundo base, superfícies brancas, sem accent */
-export const screenNeutral = {
-  flex: 1,
-  backgroundColor: colors.background,
-} as const;
-
-/** 2. CARD SECUNDÁRIO – Neutro, elevação por sombra. Sem borda colorida. */
+/** Card principal – branco, sem borda (contraste por plano) */
 export const cardSecondary = {
   backgroundColor: colors.surface,
   borderRadius: 16,
   padding: 20,
-  ...cardShadow,
 } as const;
 
-/** 3. CARD SECUNDÁRIO FLAT – Dentro de outro card ou contexto já elevado. Só borda. */
+/** Card alternado – surfaceTint só para respiro */
 export const cardFlat = {
-  backgroundColor: colors.surface,
+  backgroundColor: colors.surfaceTint,
   borderRadius: 16,
   padding: 20,
-  ...cardBorder,
 } as const;
 
-/** 4. CARD PRINCIPAL (premium) – Com elemento assinatura (brilho sutil).
- * Usar APENAS em Home ou destaque máximo.
- * Fundo accent, SEM borda colorida, sombra suave com tint accent. */
+/** Card principal accent – beterraba com presença, sem brilho */
 export const cardPrincipal = {
   backgroundColor: colors.accent,
   borderRadius: 16,
   padding: 24,
-  borderTopWidth: 1,
-  borderTopColor: 'rgba(255,255,255,0.25)',
-  shadowColor: colors.accent,
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.2,
-  shadowRadius: 12,
-  elevation: 4,
+  borderTopWidth: 0,
+  borderTopColor: 'transparent',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.06,
+  shadowRadius: 8,
+  elevation: 2,
 } as const;
 
-// ─── Alias para compatibilidade
+/** Header de seção – beterraba, peso visual */
+export const sectionHeaderAccent = {
+  backgroundColor: colors.accent,
+  paddingVertical: 16,
+  paddingHorizontal: 24,
+  borderRadius: 16,
+} as const;
+
+/** Bloco de destaque – accentDark para âncoras */
+export const blockAccentDark = {
+  backgroundColor: colors.accentDark,
+  paddingVertical: 20,
+  paddingHorizontal: 24,
+  borderRadius: 16,
+} as const;
+
 export const cardBase = cardSecondary;
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -118,7 +123,7 @@ export const headerIconWrap = {
   width: 40,
   height: 40,
   borderRadius: 20,
-  backgroundColor: colors.accentSoft,
+  backgroundColor: colors.accent,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
 };
@@ -141,3 +146,72 @@ export const inputBase = {
   paddingHorizontal: 16,
   paddingVertical: 12,
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SPACING (padrão de tela)
+// ═══════════════════════════════════════════════════════════════════════════
+export const spacing = {
+  screenPadding: 24,
+  screenPaddingTop: 20,
+  screenPaddingBottom: 48,
+  cardGap: 12,
+  sectionGap: 32,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUTTONS – variantes (usar SEMPRE, nunca estilizar na mão)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Botão secundário – fundo claro, borda sutil */
+export const buttonSecondary = {
+  backgroundColor: colors.surface,
+  borderWidth: 1,
+  borderColor: colors.border,
+  paddingVertical: 14,
+  paddingHorizontal: 24,
+  borderRadius: 14,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+} as const;
+
+/** Botão ghost – transparente, apenas texto accent */
+export const buttonGhost = {
+  backgroundColor: 'transparent',
+  paddingVertical: 14,
+  paddingHorizontal: 24,
+  borderRadius: 14,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+} as const;
+
+/** Botão danger – ações destrutivas */
+export const buttonDanger = {
+  backgroundColor: colors.danger,
+  paddingVertical: 14,
+  paddingHorizontal: 24,
+  borderRadius: 14,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+} as const;
+
+/** Botão secundário com texto accent – branco, texto rosa (ex: Agendar em card principal) */
+export const buttonSecondaryAccent = {
+  backgroundColor: colors.surface,
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+} as const;
+
+/** Botão sobre fundo accent – contorno branco, texto branco */
+export const buttonOnAccent = {
+  backgroundColor: 'rgba(255,255,255,0.2)',
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.5)',
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+} as const;

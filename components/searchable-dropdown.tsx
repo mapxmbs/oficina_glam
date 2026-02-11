@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 10,
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 15,
     color: colors.text,
   },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(172, 23, 84, 0.08)',
   },
   itemText: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 15,
     color: colors.text,
   },
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
     color: colors.textLight,
   },

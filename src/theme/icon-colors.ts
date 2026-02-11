@@ -27,12 +27,15 @@ export function getIconColor(variant: IconVariant): string {
 
 /** Variants e seus contextos de uso */
 export const iconVariantContext = {
-  /** Ícone sobre fundo claro: surface, background, accentSoft, card secundário */
   primary: colors.iconPrimary,
-  /** Ícone sobre fundo accent: CTA, card principal, botões rosa, FAB */
   onAccent: colors.iconOnAccent,
-  /** Ícone neutro, sem destaque de ação */
   neutral: colors.iconNeutral,
-  /** Ícone inativo: tab não selecionada, desabilitado */
   muted: colors.iconMuted,
 } as const;
+
+export type BackgroundVariant = 'accent' | 'accentSoft' | 'surface' | 'background';
+
+/** Regra obrigatória: ícone branco SÓ em fundo accent/escuro. Em fundos claros → iconPrimary. */
+export function getIconColorByBackground(bg: BackgroundVariant): string {
+  return bg === 'accent' ? colors.iconOnAccent : colors.iconPrimary;
+}

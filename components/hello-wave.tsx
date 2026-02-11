@@ -1,19 +1,16 @@
 import Animated from 'react-native-reanimated';
+import { BrilhoIcon } from './icons';
+import { colors } from '../src/theme/colors';
 
 export function HelloWave() {
   return (
-    <Animated.Text
+    <Animated.View
       style={{
-        fontSize: 28,
-        lineHeight: 32,
         marginTop: -6,
-        animationName: {
-          '50%': { transform: [{ rotate: '25deg' }] },
-        },
-        animationIterationCount: 4,
-        animationDuration: '300ms',
-      }}>
-      👋
-    </Animated.Text>
+        transform: [{ scale: 1.1 }],
+      }}
+    >
+      <BrilhoIcon size={28} color={colors.iconPrimary} />
+    </Animated.View>
   );
 }

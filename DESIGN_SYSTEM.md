@@ -98,6 +98,13 @@ import { colors } from '../src/theme/colors';
 | FAB, botão +                | accent         | `iconOnAccent` |
 | Header com accent           | accent         | `iconOnAccent` |
 
+### Componentes flutuantes e modais
+
+| Componente | Uso |
+|------------|-----|
+| **FloatingChatButton** | Bolha de chat com avatar Leninha (symbol.png), mensagem "Em que posso ajudar?", fundo surface, ícone accent |
+| **SearchModal** | Modal de pesquisa global – surface, ícones accent em círculos accentSoft, categorias por cor |
+
 ### Exemplos de uso incorreto
 
 ```tsx

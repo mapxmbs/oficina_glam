@@ -1,79 +1,80 @@
 /**
- * Hierarquia tipográfica – Contraste títulos vs corpo
- *
- * Princípio: Títulos destacam por tamanho e peso; corpo legível e neutro.
- * Sem fontes display decorativas no fluxo principal.
+ * Hierarquia tipográfica – Inter única (regra absoluta)
+ * Variação por peso e tamanho. Visual clean e premium.
  */
 
 export const typography = {
-  // ─── Corpo (Inter – legibilidade)
+  // ─── Corpo
   caption: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 11,
     lineHeight: 14,
   },
   label: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 12,
     lineHeight: 16,
   },
   bodyXs: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 13,
     lineHeight: 18,
   },
   body: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 15,
     lineHeight: 22,
   },
   bodySmall: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
     lineHeight: 20,
   },
   bodyLg: {
-    fontFamily: 'Inter-Regular',
+    fontFamily: 'Inter_400Regular',
     fontSize: 16,
     lineHeight: 24,
   },
 
-  // ─── Títulos (Montserrat – maior contraste com corpo)
+  // ─── Títulos (Inter com peso maior)
   titleSm: {
-    fontFamily: 'MontserratAlternates-Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 16,
     lineHeight: 22,
-    fontWeight: '600' as const,
   },
   title: {
-    fontFamily: 'MontserratAlternates-Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: '600' as const,
   },
   titleLg: {
-    fontFamily: 'MontserratAlternates-Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 20,
     lineHeight: 26,
-    fontWeight: '600' as const,
   },
   titleXl: {
-    fontFamily: 'MontserratAlternates-Medium',
+    fontFamily: 'Inter_600SemiBold',
     fontSize: 24,
     lineHeight: 30,
-    fontWeight: '600' as const,
   },
 
-  // ─── Display (LoveloBlack – apenas hero/marca, uso pontual)
+  // ─── Display (headlines principais)
   display: {
-    fontFamily: 'LoveloBlack',
+    fontFamily: 'Inter_700Bold',
     fontSize: 20,
     lineHeight: 26,
   },
   displayLg: {
-    fontFamily: 'LoveloBlack',
+    fontFamily: 'Inter_700Bold',
     fontSize: 24,
     lineHeight: 30,
+  },
+
+  // ─── Aliases para migração (mesmo que body/subheading)
+  subheading: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: 16,
+    lineHeight: 22,
   },
 } as const;
 

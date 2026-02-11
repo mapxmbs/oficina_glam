@@ -133,7 +133,7 @@ export default function ViewDocumentScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <View className="flex-1 items-center justify-center">
           <ActivityIndicator size="large" color={colors.headerBg} />
-          <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular', marginTop: 16 }}>
+          <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular', marginTop: 16 }}>
             Carregando documento...
           </Text>
         </View>
@@ -145,17 +145,17 @@ export default function ViewDocumentScreen() {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
         <View className="flex-1 items-center justify-center px-5">
-          <Text style={{ color: colors.text, fontFamily: 'MontserratAlternates-Medium', fontSize: 18, textAlign: 'center' }}>
+          <Text style={{ color: colors.text, fontFamily: 'Inter_600SemiBold', fontSize: 18, textAlign: 'center' }}>
             Documento não encontrado
           </Text>
-          <Text style={{ color: colors.textLight, fontFamily: 'Inter-Regular', fontSize: 14, textAlign: 'center', marginTop: 8 }}>
+          <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular', fontSize: 14, textAlign: 'center', marginTop: 8 }}>
             Se a tabela "documentos" ainda não existe, execute o SQL em supabase/migrations/001_create_documentos.sql no Supabase.
           </Text>
           <TouchableOpacity
             onPress={() => router.back()}
-            style={{ backgroundColor: colors.rosaClaro, marginTop: 20, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
+            style={{ backgroundColor: colors.accent, marginTop: 20, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 }}
           >
-            <Text style={{ color: 'white', fontFamily: 'MontserratAlternates-Medium', fontWeight: 'bold' }}>
+            <Text style={{ color: colors.iconOnAccent, fontFamily: 'Inter_600SemiBold', fontWeight: 'bold' }}>
               Voltar
             </Text>
           </TouchableOpacity>
@@ -166,258 +166,58 @@ export default function ViewDocumentScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Header */}
-      <View 
-        style={{ 
-          backgroundColor: colors.headerBg,
-          shadowColor: colors.rosaInteso,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
-          elevation: 4
-        }}
-        className="p-5 pb-6"
-      >
-        <View className="flex-row items-center justify-between">
-          <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
-            <ChevronLeft size={24} color={colors.iconOnAccent} />
-          </TouchableOpacity>
-          <Text 
-            style={{ 
-              fontFamily: 'LoveloBlack',
-              textTransform: 'uppercase',
-              color: 'white',
-              fontSize: 20
-            }}
-          >
-            {documentType === 'CNH' ? 'CNH' : documentType === 'CRLV' ? 'CRLV' : 'Documento'}
-          </Text>
-          <View style={{ width: 40 }} />
-        </View>
+      {/* Header – discreto */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, paddingVertical: 12, paddingTop: 16, backgroundColor: colors.background }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }}>
+          <ChevronLeft size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 17, color: colors.text }}>
+          {documentType === 'CNH' ? 'CNH' : documentType === 'CRLV' ? 'CRLV' : 'Documento'}
+        </Text>
+        <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView className="flex-1 px-5 pt-6">
-        {/* Status do Documento */}
-        <View 
-          style={{ 
-            backgroundColor: colors.cardBg,
-            borderColor: document.foto_url ? colors.success : colors.rosaMedio,
-            borderWidth: 2
-          }}
-          className="p-4 rounded-2xl mb-6"
-        >
-          <View className="flex-row items-center justify-between">
-            <View className="flex-1">
-              <Text 
-                style={{ 
-                  color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium',
-                  fontSize: 16,
-                  fontWeight: 'bold'
-                }}
-              >
-                Status
-              </Text>
-              <Text 
-                style={{ 
-                  color: document.foto_url ? colors.success : colors.textLight,
-                  fontFamily: 'Inter-Regular',
-                  fontSize: 14,
-                  marginTop: 4
-                }}
-              >
-                {document.foto_url ? `${documentType} enviada` : `${documentType} não enviada`}
-              </Text>
-            </View>
-            {document.foto_url && (
-              <View 
-                style={{ backgroundColor: colors.success }}
-                className="px-3 py-1 rounded-full"
-              >
-                <Text 
-                  style={{ 
-                    color: 'white',
-                    fontFamily: 'MontserratAlternates-Medium',
-                    fontSize: 12,
-                    fontWeight: 'bold'
-                  }}
-                >
-                  Enviado
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Preview da Imagem */}
-        {document.foto_url ? (
-          <TouchableOpacity
-            onPress={() => setShowFullImage(true)}
-            activeOpacity={0.9}
-            className="mb-6"
-          >
-            <View
-              style={{
-                backgroundColor: colors.cardBg,
-                borderColor: colors.rosaMedio,
-                borderWidth: 2,
-                borderRadius: 16,
-                overflow: 'hidden',
-                width: screenWidth - 40,
-                alignSelf: 'center',
-              }}
-            >
-              <Image
-                source={{ uri: document.foto_url }}
-                style={{ width: screenWidth - 40, height: 400 }}
-                resizeMode="contain"
-              />
-              <View 
-                style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-                className="absolute bottom-0 left-0 right-0 p-4"
-              >
-                <View className="flex-row items-center justify-center">
-                  <Eye size={20} color={colors.iconOnAccent} />
-                  <Text 
-                    style={{ 
-                      color: 'white',
-                      fontFamily: 'Inter-Regular',
-                      marginLeft: 8,
-                      fontSize: 14
-                    }}
-                  >
-                    Toque para visualizar em tela cheia
-                  </Text>
-                </View>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 8, paddingBottom: 40 }}>
+        {/* Documento como protagonista */}
+        {(() => {
+          const docUrl = document.foto_url || document.arquivo_url;
+          return docUrl ? (
+          <TouchableOpacity onPress={() => setShowFullImage(true)} activeOpacity={0.9} style={{ marginBottom: 24 }}>
+            <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 12, overflow: 'hidden', width: screenWidth - 48, alignSelf: 'center' }}>
+              <Image source={{ uri: docUrl }} style={{ width: screenWidth - 48, height: 380 }} resizeMode="contain" />
+              <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 12, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <Eye size={18} color="#fff" />
+                <Text style={{ color: '#fff', fontFamily: 'Inter_400Regular', fontSize: 13, marginLeft: 8 }}>Ver em tela cheia</Text>
               </View>
             </View>
           </TouchableOpacity>
-        ) : (
-          <View 
-            style={{ 
-              backgroundColor: colors.rosaSuper,
-              borderColor: colors.rosaMedio,
-              borderWidth: 2,
-              borderStyle: 'dashed'
-            }}
-            className="h-64 rounded-2xl items-center justify-center mb-6"
-          >
-            <ImageIcon size={48} color={colors.textLight} />
-            <Text 
-              style={{ 
-                color: colors.textLight,
-                fontFamily: 'Inter-Regular',
-                marginTop: 12,
-                fontSize: 14
-              }}
-            >
-              Nenhuma imagem enviada
-            </Text>
-          </View>
-        )}
-
-        {/* Botões de Ação */}
-        <View className="gap-3 mb-8">
-          {document.foto_url ? (
-            <View style={{ gap: 12 }}>
-              <TouchableOpacity
-                onPress={() => setShowFullImage(true)}
-                style={{ backgroundColor: colors.headerBg }}
-                className="flex-row items-center justify-center p-4 rounded-2xl"
-              >
-                <Eye size={20} color={colors.iconOnAccent} />
-                <Text 
-                  style={{ 
-                    color: 'white',
-                    fontFamily: 'MontserratAlternates-Medium',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    marginLeft: 8
-                  }}
-                >
-                  Visualizar em Tela Cheia
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => setShowImageModal(true)}
-                disabled={uploading}
-                style={{ 
-                  backgroundColor: colors.headerBg,
-                  opacity: uploading ? 0.7 : 1
-                }}
-                className="flex-row items-center justify-center p-4 rounded-2xl"
-              >
-                {uploading ? (
-                  <ActivityIndicator size="small" color={colors.iconOnAccent} />
-                ) : (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                    <Upload size={20} color={colors.iconOnAccent} />
-                    <Text 
-                      style={{ 
-                        color: 'white',
-                        fontFamily: 'MontserratAlternates-Medium',
-                        fontSize: 16,
-                        fontWeight: 'bold',
-                        marginLeft: 8
-                      }}
-                    >
-                      Atualizar Documento
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
           ) : (
-            <TouchableOpacity
-              onPress={() => setShowImageModal(true)}
-              disabled={uploading}
-              style={{ backgroundColor: colors.headerBg }}
-              className="flex-row items-center justify-center p-4 rounded-2xl"
-            >
-              {uploading ? (
-                <ActivityIndicator size="small" color={colors.iconOnAccent} />
-              ) : (
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <Upload size={20} color={colors.iconOnAccent} />
-                  <Text 
-                    style={{ 
-                      color: 'white',
-                      fontFamily: 'MontserratAlternates-Medium',
-                      fontSize: 16,
-                      fontWeight: 'bold',
-                      marginLeft: 8
-                    }}
-                  >
-                    Enviar Documento
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          )}
+          <View style={{ height: 200, borderRadius: 12, borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed', backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', marginBottom: 24 }}>
+            <ImageIcon size={40} color={colors.textTertiary} />
+            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: colors.textTertiary, marginTop: 12 }}>Nenhuma imagem</Text>
+          </View>
+          );
+        })()}
 
-          {document.foto_url && (
-            <TouchableOpacity
-              onPress={handleDelete}
-              style={{ 
-                backgroundColor: 'transparent',
-                borderColor: colors.danger,
-                borderWidth: 2
-              }}
-              className="flex-row items-center justify-center p-4 rounded-2xl"
-            >
-              <Trash2 size={20} color={colors.danger} />
-              <Text 
-                style={{ 
-                  color: colors.danger,
-                  fontFamily: 'MontserratAlternates-Medium',
-                  fontSize: 16,
-                  fontWeight: 'bold',
-                  marginLeft: 8
-                }}
-              >
-                Excluir Documento
-              </Text>
+        {/* Ações: editar e excluir */}
+        <View style={{ gap: 10 }}>
+          {(document.foto_url || document.arquivo_url) ? (
+            <>
+              <TouchableOpacity onPress={() => setShowFullImage(true)} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: colors.border, backgroundColor: colors.surface }}>
+                <Eye size={18} color={colors.text} />
+                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: colors.text, marginLeft: 8 }}>Ver em tela cheia</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowImageModal(true)} disabled={uploading} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, backgroundColor: colors.accent }}>
+                {uploading ? <ActivityIndicator size="small" color="#fff" /> : <><Upload size={18} color="#fff" /><Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: '#fff', marginLeft: 8 }}>Atualizar</Text></>}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDelete} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: colors.danger }}>
+                <Trash2 size={18} color={colors.danger} />
+                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: colors.danger, marginLeft: 8 }}>Excluir</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity onPress={() => setShowImageModal(true)} disabled={uploading} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 14, borderRadius: 12, backgroundColor: colors.accent }}>
+              {uploading ? <ActivityIndicator size="small" color="#fff" /> : <><Upload size={18} color="#fff" /><Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: '#fff', marginLeft: 8 }}>Enviar documento</Text></>}
             </TouchableOpacity>
           )}
         </View>
@@ -439,21 +239,13 @@ export default function ViewDocumentScreen() {
               >
                 <ChevronLeft size={24} color={colors.iconOnAccent} />
               </TouchableOpacity>
-              <Text style={{ color: 'white', fontFamily: 'MontserratAlternates-Medium', fontSize: 18 }}>
+              <Text style={{ color: 'white', fontFamily: 'Inter_600SemiBold', fontSize: 18 }}>
                 {documentType === 'CNH' ? 'CNH' : documentType === 'CRLV' ? 'CRLV' : 'Documento'}
               </Text>
               <View style={{ width: 40 }} />
             </View>
-            <ScrollView
-              contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }}
-              style={{ flex: 1 }}
-              showsVerticalScrollIndicator={false}
-            >
-              <Image
-                source={{ uri: document.foto_url }}
-                style={{ width: screenWidth - 32, height: screenHeight * 0.7, maxHeight: 600 }}
-                resizeMode="contain"
-              />
+            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', padding: 16 }} style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
+              <Image source={{ uri: document.foto_url || document.arquivo_url }} style={{ width: screenWidth - 32, height: screenHeight * 0.7, maxHeight: 600 }} resizeMode="contain" />
             </ScrollView>
           </SafeAreaView>
         </View>

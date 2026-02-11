@@ -1,14 +1,17 @@
-import { decode } from 'base64-arraybuffer'; // Importante para enviar ao Supabase
+import { decode } from 'base64-arraybuffer';
 import * as ImagePicker from 'expo-image-picker';
-import { useFocusEffect } from 'expo-router';
-import { Camera, Car, CheckCircle, Edit2, FileText, Save, Sparkles, UploadCloud } from 'lucide-react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { Camera, Car, CheckCircle, Edit2, Eye, FileText, Save, Sparkles, Trash2, UploadCloud } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import SearchableDropdown from '../../components/searchable-dropdown';
 import { supabase } from '../../lib/supabase';
+import { CORES, getModelosByMarca, MARCAS } from '../../lib/car-data';
 import { colors } from '../../src/theme/colors';
 
 export default function VehicleScreen() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -17,11 +20,14 @@ export default function VehicleScreen() {
   const [documentos, setDocumentos] = useState<any[]>([]);
 
   // Form States
+  const [marca, setMarca] = useState('');
   const [modelo, setModelo] = useState('');
   const [placa, setPlaca] = useState('');
   const [ano, setAno] = useState('');
   const [versao, setVersao] = useState('');
   const [cor, setCor] = useState('');
+  const [apelido, setApelido] = useState('');
+  const [dropdownOpen, setDropdownOpen] = useState<'marca' | 'modelo' | 'cor' | null>(null);
 
   // 1. BUSCAR DADOS (Veículo + Documentos)
   async function fetchData() {
@@ -32,11 +38,13 @@ export default function VehicleScreen() {
       
       if (carData) {
         setVehicle(carData);
-        setModelo(carData.modelo);
-        setPlaca(carData.placa);
+        setMarca(carData.marca || '');
+        setModelo(carData.modelo || '');
+        setPlaca(carData.placa || '');
         setAno(carData.ano?.toString() || '');
         setVersao(carData.versao || '');
         setCor(carData.cor || '');
+        setApelido(carData.apelido || '');
 
         // Busca Documentos desse veículo
         const { data: docData } = await supabase
@@ -122,7 +130,7 @@ export default function VehicleScreen() {
   async function handleSave() {
     // ... (Mantém a lógica de salvar texto que fizemos antes)
     setLoading(true);
-    const dadosToSave = { modelo, placa, ano: parseInt(ano) || null, versao, cor };
+    const dadosToSave = { marca, modelo, placa, ano: parseInt(ano) || null, versao, cor, apelido: apelido || null };
 
     try {
       if (vehicle?.id) {
@@ -146,40 +154,29 @@ export default function VehicleScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView className="flex-1 px-5 pt-4">
         
-        {/* HEADER GLAM COM GRADIENTE */}
+        {/* Header */}
         <View 
           style={{ 
-            backgroundColor: colors.headerBg,
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            elevation: 4
+            backgroundColor: colors.accent,
+            padding: 20,
+            borderRadius: 12,
+            marginBottom: 24,
           }}
-          className="p-5 rounded-3xl mb-6 relative overflow-hidden"
         >
-          {/* Background decorativo */}
-          <View 
-            style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} 
-            className="absolute -right-10 -top-10 w-32 h-32 rounded-full"
-          />
           
-          <View className="flex-row justify-between items-center relative z-10">
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
             <View className="flex-1">
               <Text 
-                style={{ 
-                  fontFamily: 'LoveloBlack',
-                  textTransform: 'uppercase'
-                }} 
-                className="text-white text-3xl font-bold mb-1"
+                style={{ fontFamily: 'Inter_700Bold' }} 
+                className="text-white text-2xl font-bold mb-1"
               >
-                Meu Carro
+                {apelido || vehicle?.modelo || 'Meu Carro'}
               </Text>
               <Text 
-                style={{ fontFamily: 'Inter-Regular' }} 
+                style={{ fontFamily: 'Inter_400Regular' }} 
                 className="text-white opacity-90 text-sm"
               >
-                {vehicle?.modelo || 'Adicione os dados do seu veículo'} 💖
+                {placa ? `Placa ${placa}` : 'Adicione os dados do seu veículo'}
               </Text>
             </View>
             <TouchableOpacity 
@@ -202,29 +199,19 @@ export default function VehicleScreen() {
           </View>
         </View>
 
-        {/* --- ÁREA DA FOTO DO CARRO COM VISUAL PREMIUM --- */}
-        <View 
-          style={{ 
-            backgroundColor: colors.surface,
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 10,
-            elevation: 4
-          }}
-          className="p-4 rounded-3xl mb-6"
-        >
+        {/* Foto do veículo */}
+        <View style={{ backgroundColor: colors.surface, padding: 24, borderRadius: 16, marginBottom: 24 }}>
           <View className="flex-row items-center mb-3">
             <View 
-              style={{ backgroundColor: colors.rosaClaro }} 
+              style={{ backgroundColor: colors.accentSoft }} 
               className="w-10 h-10 rounded-full items-center justify-center mr-3"
             >
-              <Car size={20} color="white" />
+              <Car size={20} color={colors.iconPrimary} />
             </View>
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="font-bold text-lg"
             >
@@ -242,34 +229,20 @@ export default function VehicleScreen() {
               <Image 
                 source={{ uri: vehicle.foto_url }} 
                 className="w-full h-48 rounded-2xl bg-gray-200"
-                style={{ 
-                  width: '100%', 
-                  height: 200,
-                  borderRadius: 16,
-                  borderWidth: 2,
-                  borderColor: colors.rosaMedio
-                }}
+                style={{ width: '100%', height: 200, borderRadius: 12 }}
               />
             ) : (
-              <View 
-                style={{ 
-                  backgroundColor: colors.rosaSuper,
-                  borderColor: colors.rosaMedio,
-                  borderWidth: 2,
-                  borderStyle: 'dashed'
-                }}
-                className="w-full h-48 rounded-2xl items-center justify-center"
-              >
+              <View style={{ backgroundColor: colors.background, borderStyle: 'dashed', borderWidth: 2, borderColor: colors.accent, borderRadius: 12, width: '100%', height: 200, alignItems: 'center', justifyContent: 'center' }}>
                 <View 
-                  style={{ backgroundColor: colors.rosaClaro }} 
+                  style={{ backgroundColor: colors.accentSoft }} 
                   className="w-20 h-20 rounded-full items-center justify-center mb-3"
                 >
-                  <Car size={40} color="white" />
+                  <Car size={40} color={colors.iconPrimary} />
                 </View>
                 <Text 
                   style={{ 
                     color: colors.rosaInteso,
-                    fontFamily: 'MontserratAlternates-Medium' 
+                    fontFamily: 'Inter_600SemiBold' 
                   }} 
                   className="font-bold text-base"
                 >
@@ -278,7 +251,7 @@ export default function VehicleScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'Inter-Regular' 
+                    fontFamily: 'Inter_400Regular' 
                   }} 
                   className="text-sm mt-1"
                 >
@@ -308,7 +281,7 @@ export default function VehicleScreen() {
               >
                 <ActivityIndicator size="large" color="white" />
                 <Text 
-                  style={{ fontFamily: 'Inter-Regular' }}
+                  style={{ fontFamily: 'Inter_400Regular' }}
                   className="text-white mt-2"
                 >
                   Enviando...
@@ -318,29 +291,19 @@ export default function VehicleScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* --- DADOS DO CARRO COM VISUAL GLAM --- */}
-        <View 
-          style={{ 
-            backgroundColor: colors.surface,
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 10,
-            elevation: 4
-          }}
-          className="p-5 rounded-3xl mb-6"
-        >
+        {/* Dados do carro */}
+        <View style={{ backgroundColor: colors.surface, padding: 24, borderRadius: 16, marginBottom: 24 }}>
           <View className="flex-row items-center mb-5">
             <View 
-              style={{ backgroundColor: colors.rosaClaro }} 
+              style={{ backgroundColor: colors.accentSoft }} 
               className="w-10 h-10 rounded-full items-center justify-center mr-3"
             >
-              <Sparkles size={20} color="white" />
+              <Sparkles size={20} color={colors.iconPrimary} />
             </View>
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_600SemiBold' 
               }} 
               className="font-bold text-lg"
             >
@@ -349,28 +312,87 @@ export default function VehicleScreen() {
           </View>
 
           <View className="gap-4">
+            {/* Campo Marca */}
+            <View>
+              <Text 
+                style={{ color: colors.textLight, fontFamily: 'Inter_600SemiBold' }} 
+                className="text-xs uppercase font-bold mb-2"
+              >
+                Marca
+              </Text>
+              {isEditing ? (
+                <SearchableDropdown
+                  value={marca}
+                  onSelect={setMarca}
+                  options={[...MARCAS]}
+                  placeholder="Buscar marca..."
+                  searchPlaceholder="Buscar marca..."
+                  visible={dropdownOpen === 'marca'}
+                  onClose={() => setDropdownOpen(null)}
+                />
+              ) : null}
+              <TouchableOpacity
+                onPress={() => isEditing && setDropdownOpen('marca')}
+                style={{ backgroundColor: colors.rosaSuper, borderColor: colors.rosaMedio, borderWidth: isEditing ? 1 : 0 }}
+                className="p-3 rounded-xl"
+              >
+                <Text style={{ color: colors.text, fontFamily: 'Inter_400Regular' }} className="text-base">
+                  {marca || '---'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
             {/* Campo Modelo */}
             <View>
               <Text 
-                style={{ 
-                  color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium' 
-                }} 
+                style={{ color: colors.textLight, fontFamily: 'Inter_600SemiBold' }} 
                 className="text-xs uppercase font-bold mb-2"
               >
-                Modelo do Veículo
+                Modelo
+              </Text>
+              {isEditing ? (
+                <SearchableDropdown
+                  value={modelo}
+                  onSelect={setModelo}
+                  options={getModelosByMarca(marca)}
+                  placeholder="Buscar modelo..."
+                  searchPlaceholder="Buscar modelo..."
+                  visible={dropdownOpen === 'modelo'}
+                  onClose={() => setDropdownOpen(null)}
+                />
+              ) : null}
+              <TouchableOpacity
+                onPress={() => isEditing && marca && setDropdownOpen('modelo')}
+                style={{ backgroundColor: colors.rosaSuper, borderColor: colors.rosaMedio, borderWidth: isEditing ? 1 : 0 }}
+                className="p-3 rounded-xl"
+              >
+                <Text style={{ color: colors.text, fontFamily: 'Inter_400Regular' }} className="text-base">
+                  {modelo || '---'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Campo Modelo (fallback se marca não selecionada) - removido, usando dropdown acima */}
+
+            {/* Campo Apelido (opcional) */}
+            <View>
+              <Text 
+                style={{ color: colors.textLight, fontFamily: 'Inter_600SemiBold' }} 
+                className="text-xs uppercase font-bold mb-2"
+              >
+                Apelido do carro (opcional)
               </Text>
               {isEditing ? (
                 <TextInput 
-                  value={modelo} 
-                  onChangeText={setModelo} 
-                  placeholder="Ex: Onix LTZ" 
+                  value={apelido} 
+                  onChangeText={setApelido} 
+                  placeholder="Ex: Meu Fusquinha" 
                   placeholderTextColor={colors.textLight}
                   style={{ 
                     backgroundColor: colors.rosaSuper,
                     borderColor: colors.rosaMedio,
                     color: colors.text,
-                    fontFamily: 'Inter-Regular'
+                    fontFamily: 'Inter_400Regular'
                   }}
                   className="p-3 rounded-xl border"
                 />
@@ -380,13 +402,10 @@ export default function VehicleScreen() {
                   className="p-3 rounded-xl"
                 >
                   <Text 
-                    style={{ 
-                      color: colors.text,
-                      fontFamily: 'MontserratAlternates-Medium' 
-                    }} 
-                    className="text-base font-bold"
+                    style={{ color: colors.text, fontFamily: 'Inter_600SemiBold' }} 
+                    className="text-base"
                   >
-                    {vehicle?.modelo || "---"}
+                    {apelido || '---'}
                   </Text>
                 </View>
               )}
@@ -398,7 +417,7 @@ export default function VehicleScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'MontserratAlternates-Medium' 
+                    fontFamily: 'Inter_600SemiBold' 
                   }} 
                   className="text-xs uppercase font-bold mb-2"
                 >
@@ -415,18 +434,18 @@ export default function VehicleScreen() {
                       backgroundColor: colors.rosaSuper,
                       borderColor: colors.rosaMedio,
                       color: colors.text,
-                      fontFamily: 'Inter-Regular'
+                      fontFamily: 'Inter_400Regular'
                     }}
                     className="p-3 rounded-xl border text-center"
                   />
                 ) : (
                   <View 
-                    style={{ backgroundColor: colors.rosaClaro }}
+                    style={{ backgroundColor: colors.accentSoft }}
                     className="p-3 rounded-xl"
                   >
                     <Text 
-                      style={{ fontFamily: 'MontserratAlternates-Medium' }} 
-                      className="text-white text-base font-bold text-center"
+                      style={{ color: colors.iconPrimary, fontFamily: 'Inter_600SemiBold' }} 
+                      className="text-base font-bold text-center"
                     >
                       {vehicle?.placa || "---"}
                     </Text>
@@ -438,7 +457,7 @@ export default function VehicleScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'MontserratAlternates-Medium' 
+                    fontFamily: 'Inter_600SemiBold' 
                   }} 
                   className="text-xs uppercase font-bold mb-2"
                 >
@@ -456,7 +475,7 @@ export default function VehicleScreen() {
                       backgroundColor: colors.rosaSuper,
                       borderColor: colors.rosaMedio,
                       color: colors.text,
-                      fontFamily: 'Inter-Regular'
+                      fontFamily: 'Inter_400Regular'
                     }}
                     className="p-3 rounded-xl border"
                   />
@@ -468,7 +487,7 @@ export default function VehicleScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }} 
                       className="text-base"
                     >
@@ -485,7 +504,7 @@ export default function VehicleScreen() {
                 <Text 
                   style={{ 
                     color: colors.textLight,
-                    fontFamily: 'MontserratAlternates-Medium' 
+                    fontFamily: 'Inter_600SemiBold' 
                   }} 
                   className="text-xs uppercase font-bold mb-2"
                 >
@@ -501,7 +520,7 @@ export default function VehicleScreen() {
                       backgroundColor: colors.rosaSuper,
                       borderColor: colors.rosaMedio,
                       color: colors.text,
-                      fontFamily: 'Inter-Regular'
+                      fontFamily: 'Inter_400Regular'
                     }}
                     className="p-3 rounded-xl border"
                   />
@@ -513,7 +532,7 @@ export default function VehicleScreen() {
                     <Text 
                       style={{ 
                         color: colors.text,
-                        fontFamily: 'Inter-Regular' 
+                        fontFamily: 'Inter_400Regular' 
                       }} 
                       className="text-base"
                     >
@@ -525,241 +544,139 @@ export default function VehicleScreen() {
               
               <View className="flex-1">
                 <Text 
-                  style={{ 
-                    color: colors.textLight,
-                    fontFamily: 'MontserratAlternates-Medium' 
-                  }} 
+                  style={{ color: colors.textLight, fontFamily: 'Inter_600SemiBold' }} 
                   className="text-xs uppercase font-bold mb-2"
                 >
                   Cor
                 </Text>
                 {isEditing ? (
-                  <TextInput 
-                    value={cor} 
-                    onChangeText={setCor} 
-                    placeholder="Ex: Branco" 
-                    placeholderTextColor={colors.textLight}
-                    style={{ 
-                      backgroundColor: colors.rosaSuper,
-                      borderColor: colors.rosaMedio,
-                      color: colors.text,
-                      fontFamily: 'Inter-Regular'
-                    }}
-                    className="p-3 rounded-xl border"
-                  />
-                ) : (
-                  <View 
-                    style={{ backgroundColor: colors.rosaSuper }}
-                    className="p-3 rounded-xl"
-                  >
-                    <Text 
-                      style={{ 
-                        color: colors.text,
-                        fontFamily: 'Inter-Regular' 
-                      }} 
-                      className="text-base"
+                  <>
+                    <SearchableDropdown
+                      value={cor}
+                      onSelect={setCor}
+                      options={[...CORES]}
+                      placeholder="Buscar cor..."
+                      searchPlaceholder="Buscar cor..."
+                      visible={dropdownOpen === 'cor'}
+                      onClose={() => setDropdownOpen(null)}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setDropdownOpen('cor')}
+                      style={{ backgroundColor: colors.rosaSuper, borderColor: colors.rosaMedio, borderWidth: 1 }}
+                      className="p-3 rounded-xl"
                     >
-                      {vehicle?.cor || "---"}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
-          </View>
-        </View>
-
-        {/* --- DOCUMENTOS COM VISUAL PREMIUM E SEGURO --- */}
-        <View 
-          style={{ 
-            backgroundColor: colors.surface,
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 10,
-            elevation: 4
-          }}
-          className="p-5 rounded-3xl mb-6"
-        >
-          <View className="flex-row items-center justify-between mb-2">
-            <View className="flex-row items-center">
-              <View 
-                style={{ backgroundColor: colors.rosaClaro }} 
-                className="w-10 h-10 rounded-full items-center justify-center mr-3"
-              >
-                <FileText size={20} color="white" />
-              </View>
-              <Text 
-                style={{ 
-                  color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium' 
-                }} 
-                className="font-bold text-lg"
-              >
-                Documentos 🔒
-              </Text>
-            </View>
-          </View>
-
-          <View 
-            style={{ backgroundColor: colors.rosaSuper }}
-            className="p-3 rounded-xl mb-4"
-          >
-            <Text 
-              style={{ 
-                color: colors.textLight,
-                fontFamily: 'Inter-Regular' 
-              }} 
-              className="text-xs italic"
-            >
-              ⚠️ Em breve: criptografia e biometria para acessar documentos sensíveis
-            </Text>
-          </View>
-        
-          <View className="flex-row gap-4">
-            {/* Botão CNH */}
-            <TouchableOpacity 
-              onPress={() => uploadFile('CNH')}
-              disabled={uploading}
-              activeOpacity={0.8}
-              style={{ 
-                backgroundColor: hasDoc('CNH') ? colors.success : colors.surface,
-                borderColor: hasDoc('CNH') ? colors.success : colors.rosaMedio,
-                shadowColor: hasDoc('CNH') ? colors.success : colors.rosaInteso,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                elevation: 2
-              }}
-              className="flex-1 p-4 rounded-2xl border-2 items-center"
-            >
-              {hasDoc('CNH') ? (
-                <CheckCircle size={32} color="white" className="mb-2"/>
-              ) : (
-                <UploadCloud size={32} color={colors.headerBg} className="mb-2"/>
-              )}
-              <Text 
-                style={{ 
-                  color: hasDoc('CNH') ? 'white' : colors.text,
-                  fontFamily: 'MontserratAlternates-Medium' 
-                }} 
-                className="font-bold"
-              >
-                Minha CNH
-              </Text>
-              <Text 
-                style={{ 
-                  color: hasDoc('CNH') ? 'rgba(255,255,255,0.9)' : colors.textLight,
-                  fontFamily: 'Inter-Regular' 
-                }} 
-                className="text-xs mt-1 text-center"
-              >
-                {hasDoc('CNH') ? '✓ Enviado' : 'PDF ou Foto'}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Botão CRLV */}
-            <TouchableOpacity 
-              onPress={() => uploadFile('CRLV')}
-              disabled={uploading}
-              activeOpacity={0.8}
-              style={{ 
-                backgroundColor: hasDoc('CRLV') ? colors.warning : colors.surface,
-                borderColor: hasDoc('CRLV') ? colors.warning : colors.rosaMedio,
-                shadowColor: hasDoc('CRLV') ? colors.warning : colors.rosaInteso,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                elevation: 2
-              }}
-              className="flex-1 p-4 rounded-2xl border-2 items-center"
-            >
-              {hasDoc('CRLV') ? (
-                <CheckCircle size={32} color="white" className="mb-2"/>
-              ) : (
-                <UploadCloud size={32} color={colors.headerBg} className="mb-2"/>
-              )}
-              <Text 
-                style={{ 
-                  color: hasDoc('CRLV') ? 'white' : colors.text,
-                  fontFamily: 'MontserratAlternates-Medium' 
-                }} 
-                className="font-bold"
-              >
-                Doc. Veículo
-              </Text>
-              <Text 
-                style={{ 
-                  color: hasDoc('CRLV') ? 'rgba(255,255,255,0.9)' : colors.textLight,
-                  fontFamily: 'Inter-Regular' 
-                }} 
-                className="text-xs mt-1 text-center"
-              >
-                {hasDoc('CRLV') ? '✓ CRLV OK' : 'CRLV/DUT'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Listagem de Arquivos Extras (outros documentos) */}
-        {documentos.length > 0 && (
-          <View 
-            style={{ 
-              backgroundColor: colors.surface,
-              shadowColor: colors.rosaInteso,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 10,
-              elevation: 4
-            }}
-            className="p-5 rounded-3xl mb-8"
-          >
-            <Text 
-              style={{ 
-                color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium' 
-              }} 
-              className="font-bold text-base mb-4"
-            >
-              Arquivos Salvos
-            </Text>
-            {documentos.map(doc => (
-              <View 
-                key={doc.id} 
-                style={{ 
-                  backgroundColor: colors.rosaSuper,
-                  borderColor: colors.rosaMedio
-                }}
-                className="flex-row items-center p-4 rounded-xl border mb-2"
-              >
-                <View 
-                  style={{ backgroundColor: colors.rosaClaro }}
-                  className="w-10 h-10 rounded-full items-center justify-center mr-3"
-                >
-                  <FileText size={18} color={colors.headerBg} />
-                </View>
-                <Text 
-                  style={{ 
-                    color: colors.text,
-                    fontFamily: 'Inter-Regular' 
-                  }} 
-                  className="flex-1"
-                >
-                  {doc.tipo}
-                </Text>
-                <View 
-                  style={{ backgroundColor: colors.success }}
-                  className="px-3 py-1 rounded-full"
-                >
-                  <Text 
-                    style={{ fontFamily: 'MontserratAlternates-Medium' }}
-                    className="text-white text-xs font-bold"
-                  >
-                    OK
+                      <Text style={{ color: colors.text, fontFamily: 'Inter_400Regular' }} className="text-base">
+                        {cor || '---'}
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                <View style={{ backgroundColor: colors.rosaSuper }} className="p-3 rounded-xl">
+                  <Text style={{ color: colors.text, fontFamily: 'Inter_400Regular' }} className="text-base">
+                    {vehicle?.cor || "---"}
                   </Text>
                 </View>
+              )}
               </View>
-            ))}
+            </View>
           </View>
+        </View>
+
+        {/* Documentos */}
+        <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 24, marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+            <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.background, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+              <FileText size={20} color={colors.textSecondary} />
+            </View>
+            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 18, color: colors.text }}>Documentos</Text>
+          </View>
+
+          <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
+            <TouchableOpacity
+              onPress={() => uploadFile('CNH')}
+              disabled={uploading}
+              style={{
+                flex: 1,
+                paddingVertical: 14,
+                paddingHorizontal: 12,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: hasDoc('CNH') ? colors.success : colors.border,
+                backgroundColor: hasDoc('CNH') ? `${colors.success}12` : colors.surface,
+                alignItems: 'center',
+              }}
+            >
+              {hasDoc('CNH') ? <CheckCircle size={24} color={colors.success} /> : <UploadCloud size={24} color={colors.textSecondary} />}
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: hasDoc('CNH') ? colors.success : colors.text, marginTop: 6 }}>CNH</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 11, color: colors.textTertiary, marginTop: 2 }}>{hasDoc('CNH') ? 'Enviado' : 'Enviar'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => uploadFile('CRLV')}
+              disabled={uploading}
+              style={{
+                flex: 1,
+                paddingVertical: 14,
+                paddingHorizontal: 12,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: hasDoc('CRLV') ? colors.success : colors.border,
+                backgroundColor: hasDoc('CRLV') ? `${colors.success}12` : colors.surface,
+                alignItems: 'center',
+              }}
+            >
+              {hasDoc('CRLV') ? <CheckCircle size={24} color={colors.success} /> : <UploadCloud size={24} color={colors.textSecondary} />}
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 13, color: hasDoc('CRLV') ? colors.success : colors.text, marginTop: 6 }}>CRLV</Text>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 11, color: colors.textTertiary, marginTop: 2 }}>{hasDoc('CRLV') ? 'Enviado' : 'Enviar'}</Text>
+            </TouchableOpacity>
+          </View>
+
+          {documentos.length > 0 && (
+            <>
+              <View style={{ height: 1, backgroundColor: colors.border, marginBottom: 12 }} />
+              {documentos.map((doc) => (
+                <TouchableOpacity
+                  key={doc.id}
+                  onPress={() => router.push(`/view-document?id=${doc.id}&type=${doc.tipo}`)}
+                  style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: documentos.indexOf(doc) < documentos.length - 1 ? 1 : 0, borderBottomColor: colors.border }}
+                  activeOpacity={0.7}
+                >
+                  <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                    <FileText size={18} color={colors.textSecondary} />
+                  </View>
+                  <Text style={{ flex: 1, fontFamily: 'Inter_500Medium', fontSize: 15, color: colors.text }}>{doc.tipo}</Text>
+                  <Eye size={18} color={colors.accent} />
+                </TouchableOpacity>
+              ))}
+            </>
+          )}
+        </View>
+
+        {/* Botão Salvar no final da tela */}
+        {isEditing && (
+          <TouchableOpacity
+            onPress={handleSave}
+            disabled={loading}
+            style={{
+              backgroundColor: colors.accent,
+              shadowColor: colors.accent,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              elevation: 4
+            }}
+            className="flex-row items-center justify-center p-4 rounded-2xl mb-10"
+          >
+            {loading ? (
+              <ActivityIndicator color={colors.iconOnAccent} />
+            ) : (
+              <>
+                <Save size={22} color={colors.iconOnAccent} />
+                <Text style={{ color: colors.iconOnAccent, fontFamily: 'Inter_600SemiBold' }} className="font-bold text-base ml-2">
+                  Salvar alterações
+                </Text>
+              </>
+            )}
+          </TouchableOpacity>
         )}
 
       </ScrollView>

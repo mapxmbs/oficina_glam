@@ -47,7 +47,7 @@ export default function FullscreenPhotoModal({
             <Text
               style={{
                 color: 'white',
-                fontFamily: 'MontserratAlternates-Medium',
+                fontFamily: 'Inter_600SemiBold',
                 fontSize: 18,
               }}
               numberOfLines={1}
