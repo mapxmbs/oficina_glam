@@ -8,6 +8,7 @@ import { Pressable, Text } from 'react-native';
 import { colors } from '../../src/theme/colors';
 import {
   ctaPrimary,
+  ctaPrimaryMuted,
   buttonSecondary,
   buttonSecondaryAccent,
   buttonGhost,
@@ -16,7 +17,7 @@ import {
 } from '../../src/theme/design-patterns';
 import { typography } from '../../src/theme/typography';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'secondaryAccent' | 'ghost' | 'danger' | 'onAccent';
+export type ButtonVariant = 'primary' | 'primaryMuted' | 'secondary' | 'secondaryAccent' | 'ghost' | 'danger' | 'onAccent';
 
 type ButtonProps = ViewProps & {
   variant?: ButtonVariant;
@@ -29,6 +30,7 @@ type ButtonProps = ViewProps & {
 
 const variantStyle = {
   primary: ctaPrimary,
+  primaryMuted: ctaPrimaryMuted,
   secondary: buttonSecondary,
   secondaryAccent: buttonSecondaryAccent,
   ghost: buttonGhost,
@@ -38,6 +40,7 @@ const variantStyle = {
 
 const textColor = {
   primary: colors.iconOnAccent,
+  primaryMuted: colors.iconOnAccent,
   secondary: colors.text,
   secondaryAccent: colors.accent,
   ghost: colors.accent,
@@ -55,7 +58,7 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const btnStyle = variantStyle[variant];
-  const color = textColor[variant];
+  const color = disabled ? colors.textMedium : textColor[variant];
 
   return (
     <Pressable
@@ -63,7 +66,8 @@ export function Button({
       disabled={disabled}
       style={({ pressed }) => [
         btnStyle,
-        { opacity: disabled ? 0.5 : pressed ? 0.9 : 1 },
+        disabled && { backgroundColor: colors.surfaceTint, borderColor: colors.border, borderWidth: 1 },
+        !disabled && pressed && { transform: [{ scale: 0.98 }] },
         style,
       ]}
       {...rest}

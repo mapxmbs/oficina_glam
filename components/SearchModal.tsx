@@ -87,7 +87,7 @@ export function SearchModal({ visible, onClose }: Props) {
       onRequestClose={onClose}
     >
       <View style={{ flex: 1, flexDirection: 'column' }}>
-        <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)' }} onPress={onClose} />
+        <Pressable style={{ flex: 1, backgroundColor: colors.overlayDark }} onPress={onClose} />
         <View
           style={{
             backgroundColor: colors.surface,

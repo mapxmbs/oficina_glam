@@ -18,6 +18,8 @@ export default function RootLayout() {
     Inter_500Medium: require('../assets/fonts/Inter_500Medium.ttf'),
     Inter_600SemiBold: require('../assets/fonts/Inter_600SemiBold.ttf'),
     Inter_700Bold: require('../assets/fonts/Inter_700Bold.ttf'),
+    LoveloBlack: require('../assets/fonts/LOVELOBL.otf'),
+    MontserratAlternates_500Medium: require('../assets/fonts/MontserratAlternates-Medium.ttf'),
   });
 
   const isReady = loaded || error || forceReady;

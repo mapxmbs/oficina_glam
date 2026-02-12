@@ -1,17 +1,17 @@
 /**
- * Hierarquia tipográfica – Inter única (regra absoluta)
- * Variação por peso e tamanho. Visual clean e premium.
+ * Hierarquia tipográfica – Lovelo (headlines), Montserrat (destaques), Inter (corpo)
+ * Pesos: 400 corpo | 500 subheading | 600 dados/labels | 700 ênfase
  */
 
 export const typography = {
-  // ─── Corpo
+  // ─── Corpo (Inter – legibilidade)
   caption: {
     fontFamily: 'Inter_400Regular',
     fontSize: 11,
     lineHeight: 14,
   },
   label: {
-    fontFamily: 'Inter_400Regular',
+    fontFamily: 'MontserratAlternates_500Medium',
     fontSize: 12,
     lineHeight: 16,
   },
@@ -36,41 +36,67 @@ export const typography = {
     lineHeight: 24,
   },
 
-  // ─── Títulos (Inter com peso maior)
+  // ─── Títulos (Montserrat – elegância)
   titleSm: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'MontserratAlternates_500Medium',
     fontSize: 16,
     lineHeight: 22,
   },
   title: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'MontserratAlternates_500Medium',
     fontSize: 18,
     lineHeight: 24,
   },
   titleLg: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'MontserratAlternates_500Medium',
     fontSize: 20,
     lineHeight: 26,
   },
   titleXl: {
-    fontFamily: 'Inter_600SemiBold',
+    fontFamily: 'MontserratAlternates_500Medium',
     fontSize: 24,
     lineHeight: 30,
   },
 
-  // ─── Display (headlines principais)
+  // ─── Display / Títulos de tela (Lovelo – tipografia oficial da marca)
   display: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 20,
-    lineHeight: 26,
+    fontFamily: 'LoveloBlack',
+    fontSize: 22,
+    lineHeight: 28,
+    letterSpacing: 0.25,
   },
   displayLg: {
-    fontFamily: 'Inter_700Bold',
-    fontSize: 24,
-    lineHeight: 30,
+    fontFamily: 'LoveloBlack',
+    fontSize: 26,
+    lineHeight: 32,
+    letterSpacing: 0.25,
+  },
+  /** Título principal de tela – usar em TODAS as telas (ex: Rede Glam, Combustível) */
+  screenTitle: {
+    fontFamily: 'LoveloBlack',
+    fontSize: 26,
+    lineHeight: 32,
+    letterSpacing: 0.25,
+  },
+  /** Subtítulo de tela – linha abaixo do título */
+  screenSubtitle: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+    lineHeight: 20,
   },
 
-  // ─── Aliases para migração (mesmo que body/subheading)
+  // ─── Dados técnicos (Inter – sempre legível)
+  data: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  dataLg: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 22,
+    lineHeight: 28,
+  },
+
   subheading: {
     fontFamily: 'Inter_500Medium',
     fontSize: 16,

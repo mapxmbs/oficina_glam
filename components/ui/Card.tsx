@@ -6,9 +6,9 @@
 import type { ViewProps } from 'react-native';
 import { Pressable, View } from 'react-native';
 import {
+  blockAccent,
+  blockSoft,
   cardBase,
-  cardFlat,
-  cardPrincipal,
 } from '../../src/theme/design-patterns';
 
 export type CardVariant = 'base' | 'flat' | 'principal';
@@ -22,8 +22,8 @@ type CardProps = ViewProps & {
 
 const variantMap = {
   base: cardBase,
-  flat: cardFlat,
-  principal: cardPrincipal,
+  flat: blockSoft,
+  principal: blockAccent,
 };
 
 export function Card({
@@ -39,7 +39,7 @@ export function Card({
     return (
       <Pressable
         onPress={onPress}
-        style={({ pressed }) => [baseStyle, { opacity: pressed ? 0.96 : 1 }, style]}
+        style={({ pressed }) => [baseStyle, { transform: [{ scale: pressed ? 0.995 : 1 }] }, style]}
         {...rest}
       >
         {children}

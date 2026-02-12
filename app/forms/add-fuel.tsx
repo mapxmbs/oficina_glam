@@ -1,43 +1,46 @@
-import { useRouter } from 'expo-router';
-import { ArrowLeft, DollarSign, Droplet, Gauge, MapPin, Save } from 'lucide-react-native';
-import { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { ArrowLeft, ChevronDown, DollarSign, Droplet, Gauge, MapPin, Save } from 'lucide-react-native';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { fetchPostos, POSTOS_FALLBACK } from '../../lib/postos';
 import { supabase } from '../../lib/supabase';
+import SearchableDropdown from '../../components/searchable-dropdown';
+import { colors } from '../../src/theme/colors';
+import { typography } from '../../src/theme/typography';
+import { toISODate } from '../../lib/dates';
 
 export default function AddFuelScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  
-  // Dados do formulário
   const [station, setStation] = useState('');
+  const [postosList, setPostosList] = useState<string[]>([...POSTOS_FALLBACK]);
+  const [dropdownPosto, setDropdownPosto] = useState(false);
   const [liters, setLiters] = useState('');
-  const [type, setType] = useState('Gasolina'); // Valor padrão
+  const [type, setType] = useState('Gasolina');
   const [total, setTotal] = useState('');
   const [km, setKm] = useState('');
-  const [date, setDate] = useState(new Date().toLocaleDateString('pt-BR'));
+  const [date, setDate] = useState<Date>(new Date());
+
+  useFocusEffect(useCallback(() => {
+    fetchPostos().then(setPostosList);
+  }, []));
 
   async function handleSave() {
     if (!station || !liters || !total || !km) {
       Alert.alert("Ops!", "Preencha os campos obrigatórios.");
       return;
     }
-
     setLoading(true);
-
-    const { error } = await supabase
-      .from('abastecimentos')
-      .insert({
-        posto: station,
-        litros: Number(liters.replace(',', '.')),
-        tipo: type,
-        valor_total: Number(total.replace(',', '.')),
-        km: Number(km),
-        data: date
-      });
-
+    const { error } = await supabase.from('abastecimentos').insert({
+      posto: station,
+      litros: Number(liters.replace(',', '.')),
+      tipo: type,
+      valor_total: Number(total.replace(',', '.')),
+      km: Number(km),
+      data: toISODate(date),
+    });
     setLoading(false);
-
     if (error) {
       Alert.alert("Erro", error.message);
     } else {
@@ -47,28 +50,38 @@ export default function AddFuelScreen() {
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View className="flex-row items-center px-5 py-4 border-b border-gray-100">
         <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
           <ArrowLeft size={24} color="#4A4A4A" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-glam-dark ml-2">Novo Abastecimento</Text>
+        <Text style={[typography.screenTitle, { color: colors.text, marginLeft: 8 }]}>Novo Abastecimento</Text>
       </View>
 
       <ScrollView className="flex-1 px-5 pt-6">
         
-        {/* Posto */}
+        {/* Posto – dropdown com busca */}
         <View className="mb-5">
           <Text className="text-glam-dark font-bold mb-2 ml-1">Qual Posto?</Text>
-          <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 h-14">
-            <MapPin size={20} color="#E91E63" />
-            <TextInput 
-              className="flex-1 ml-3 text-gray-700 text-base"
-              placeholder="Ex: Posto Ipiranga"
-              value={station}
-              onChangeText={setStation}
-            />
-          </View>
+          <TouchableOpacity
+            onPress={() => setDropdownPosto(true)}
+            className="flex-row items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 h-14"
+          >
+            <MapPin size={20} color={colors.accent} style={{ marginRight: 12 }} />
+            <Text className={`flex-1 text-base ${station ? 'text-gray-700' : 'text-gray-400'}`}>
+              {station || 'Selecionar ou buscar posto…'}
+            </Text>
+            <ChevronDown size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+          <SearchableDropdown
+            value={station}
+            onSelect={setStation}
+            options={postosList}
+            placeholder="Ex: Posto Ipiranga"
+            searchPlaceholder="Buscar posto…"
+            visible={dropdownPosto}
+            onClose={() => setDropdownPosto(false)}
+          />
         </View>
 
         <View className="flex-row justify-between">

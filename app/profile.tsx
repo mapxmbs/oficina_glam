@@ -7,6 +7,7 @@ import { ActivityIndicator, Alert, Image, Modal, ScrollView, Text, TextInput, To
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { colors } from '../src/theme/colors';
+import { typography } from '../src/theme/typography';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -230,9 +231,9 @@ export default function ProfileScreen() {
           style={{ 
             backgroundColor: colors.headerBg,
             shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 6,
             elevation: 4
           }}
           className="p-5 pb-20 relative overflow-hidden"
@@ -256,14 +257,13 @@ export default function ProfileScreen() {
               disabled={loading}
               style={{ 
                 backgroundColor: loading ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.25)',
-                opacity: loading ? 0.6 : 1
               }}
               className="p-3 rounded-full"
             >
               {loading ? (
                 <ActivityIndicator size="small" color="white" />
               ) : isEditing ? (
-                <Text style={{ fontFamily: 'MontserratAlternates-Medium' }} className="text-white font-bold">
+                <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-white font-bold">
                   Salvar
                 </Text>
               ) : (
@@ -272,21 +272,8 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          <Text 
-            style={{ 
-              fontFamily: 'Inter_700Bold',
-              textTransform: 'uppercase'
-            }} 
-            className="text-white text-3xl font-bold text-center relative z-10"
-          >
-            Meu Perfil
-          </Text>
-          <Text 
-            style={{ fontFamily: 'Inter_400Regular' }} 
-            className="text-white opacity-90 text-sm text-center mt-1 relative z-10"
-          >
-            Perfil de DIVA
-          </Text>
+          <Text style={[typography.screenTitle, { color: 'white', textAlign: 'center' }]} className="relative z-10">Meu Perfil</Text>
+          <Text style={[typography.screenSubtitle, { color: 'rgba(255,255,255,0.92)', textAlign: 'center', marginTop: 4 }]} className="relative z-10">Perfil de DIVA</Text>
         </View>
 
         {/* FOTO DE PERFIL (SOBREPOSTA) */}
@@ -328,8 +315,8 @@ export default function ProfileScreen() {
               style={{ 
                 backgroundColor: colors.headerBg,
                 shadowColor: colors.rosaInteso,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.3,
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
                 shadowRadius: 4,
                 position: 'absolute',
                 bottom: 0,
@@ -350,7 +337,7 @@ export default function ProfileScreen() {
             <Text 
               style={{ 
                 color: colors.rosaEscuro,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_500Medium' 
               }} 
               className="text-2xl font-bold"
             >
@@ -380,9 +367,9 @@ export default function ProfileScreen() {
             style={{ 
               backgroundColor: colors.surface,
               shadowColor: colors.rosaInteso,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 8,
               elevation: 4
             }}
             className="p-5 rounded-3xl mb-6"
@@ -397,7 +384,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="font-bold text-lg"
               >
@@ -410,7 +397,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="text-xs uppercase font-bold mb-2"
               >
@@ -453,7 +440,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="text-xs uppercase font-bold mb-2"
               >
@@ -506,9 +493,9 @@ export default function ProfileScreen() {
             style={{ 
               backgroundColor: colors.surface,
               shadowColor: colors.rosaInteso,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 8,
               elevation: 4
             }}
             className="p-5 rounded-3xl mb-6"
@@ -523,7 +510,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="font-bold text-lg"
               >
@@ -536,7 +523,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="text-xs uppercase font-bold mb-2"
               >
@@ -581,7 +568,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="text-xs uppercase font-bold mb-2"
               >
@@ -626,9 +613,9 @@ export default function ProfileScreen() {
             style={{ 
               backgroundColor: colors.surface,
               shadowColor: colors.rosaInteso,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 10,
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.05,
+              shadowRadius: 8,
               elevation: 4
             }}
             className="p-5 rounded-3xl mb-6"
@@ -643,7 +630,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="font-bold text-lg"
               >
@@ -656,7 +643,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="text-xs uppercase font-bold mb-2"
               >
@@ -725,7 +712,7 @@ export default function ProfileScreen() {
         onRequestClose={() => setShowFotoModal(false)}
       >
         <View 
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          style={{ backgroundColor: colors.overlayDark }}
           className="flex-1 items-center justify-center p-5"
         >
           <View 
@@ -735,9 +722,9 @@ export default function ProfileScreen() {
               width: '100%',
               maxWidth: 400,
               shadowColor: '#000',
-              shadowOffset: { width: 0, height: 10 },
-              shadowOpacity: 0.3,
-              shadowRadius: 20,
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.06,
+              shadowRadius: 12,
               elevation: 10
             }}
             className="p-6"
@@ -747,7 +734,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.rosaEscuro,
-                  fontFamily: 'MontserratAlternates-Medium',
+                  fontFamily: 'Inter_500Medium',
                   fontSize: 20
                 }}
                 className="font-bold"
@@ -785,7 +772,7 @@ export default function ProfileScreen() {
                 <Text 
                   style={{ 
                     color: colors.text,
-                    fontFamily: 'MontserratAlternates-Medium'
+                    fontFamily: 'Inter_500Medium'
                   }}
                   className="font-bold text-base"
                 >
@@ -825,7 +812,7 @@ export default function ProfileScreen() {
                 <Text 
                   style={{ 
                     color: colors.text,
-                    fontFamily: 'MontserratAlternates-Medium'
+                    fontFamily: 'Inter_500Medium'
                   }}
                   className="font-bold text-base"
                 >
@@ -852,7 +839,6 @@ export default function ProfileScreen() {
                 backgroundColor: 'transparent',
                 borderWidth: 1,
                 borderColor: colors.rosaMedio,
-                opacity: uploading ? 0.5 : 1
               }}
               className="p-4 rounded-2xl mt-2"
               activeOpacity={0.7}
@@ -860,7 +846,7 @@ export default function ProfileScreen() {
               <Text 
                 style={{ 
                   color: colors.textLight,
-                  fontFamily: 'MontserratAlternates-Medium',
+                  fontFamily: 'Inter_500Medium',
                   textAlign: 'center'
                 }}
                 className="font-bold"

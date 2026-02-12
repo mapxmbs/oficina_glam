@@ -6,6 +6,8 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../../lib/supabase';
+import { colors } from '../../src/theme/colors';
+import { typography } from '../../src/theme/typography';
 
 export default function EditVehicleScreen() {
   const router = useRouter();
@@ -84,7 +86,7 @@ export default function EditVehicleScreen() {
         <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
           <ArrowLeft size={24} color="#4A4A4A" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-glam-dark ml-2">Dados do Veículo</Text>
+        <Text style={[typography.screenTitle, { color: colors.text, marginLeft: 8 }]}>Dados do Veículo</Text>
       </View>
 
       <ScrollView className="flex-1 px-5 pt-6">

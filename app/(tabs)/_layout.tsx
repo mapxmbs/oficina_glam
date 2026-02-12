@@ -16,7 +16,7 @@ const tabBarPaddingTop = isNarrow ? 6 : 8;
 const tabBarMarginH = isNarrow ? 24 : 32;
 const tabBarRadius = 28;
 
-const tabIconColor = (focused: boolean) => getIconColor(focused ? 'primary' : 'muted');
+const tabIconColor = (focused: boolean) => getIconColor(focused ? 'primary' : 'inactive');
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -29,24 +29,23 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: colors.iconPrimary,
-        tabBarInactiveTintColor: colors.iconMuted,
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
           position: 'absolute',
           left: tabBarMarginH,
           right: tabBarMarginH,
-          bottom: bottomInset + 8,
+          bottom: bottomInset + 4,
           height: tabBarContentHeight + tabBarPaddingTop,
           backgroundColor: colors.surface,
           borderTopWidth: 0,
           borderRadius: tabBarRadius,
-          borderWidth: 0,
           overflow: 'hidden',
-          elevation: 4,
+          elevation: 1,
           shadowColor: '#000',
-          shadowOpacity: 0.06,
-          shadowOffset: { width: 0, height: 2 },
-          shadowRadius: 12,
+          shadowOpacity: 0.02,
+          shadowOffset: { width: 0, height: -1 },
+          shadowRadius: 2,
           paddingTop: tabBarPaddingTop,
           paddingBottom: 0,
         },

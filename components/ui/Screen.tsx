@@ -1,13 +1,13 @@
 /**
  * Screen – wrapper padrão para telas
- * Usa EXCLUSIVAMENTE theme (screenNeutral, colors.background)
+ * Fundo sólido, sem transparência, sem BlurView.
  */
 
 import type { ViewProps } from 'react-native';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../src/theme/colors';
-import { screenNeutral, spacing } from '../../src/theme/design-patterns';
+import { spacing } from '../../src/theme/design-patterns';
 
 type ScreenProps = ViewProps & {
   scroll?: boolean;
@@ -32,9 +32,11 @@ export function Screen({
     paddingBottom: spacing.screenPaddingBottom,
   };
 
+  const screenStyle = { flex: 1, backgroundColor: colors.background };
+
   if (scroll) {
     return (
-      <SafeAreaView style={[screenNeutral, style]} edges={['top']}>
+      <SafeAreaView style={[screenStyle, style]} edges={['top']}>
         <ScrollView
           contentContainerStyle={[padding, contentContainerStyle]}
           showsVerticalScrollIndicator={false}

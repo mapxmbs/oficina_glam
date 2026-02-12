@@ -3,53 +3,54 @@ import { ArrowLeft, Calendar, DollarSign, Gauge, Save, Wrench } from 'lucide-rea
 import { useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { supabase } from '../../lib/supabase'; // Importando nosso banco
+import { supabase } from '../../lib/supabase';
+import { colors } from '../../src/theme/colors';
+import { typography } from '../../src/theme/typography';
+import { formatBR, toISODate } from '../../lib/dates';
+import { getActiveVehicleId } from '../../lib/vehicle';
 
 export default function AddMaintenanceScreen() {
   const router = useRouter();
-  
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState('');
   const [km, setKm] = useState('');
   const [value, setValue] = useState('');
-  const [date, setDate] = useState(new Date().toLocaleDateString('pt-BR'));
+  const [date, setDate] = useState<Date>(new Date());
 
-  // Função que envia para o Supabase
   async function handleSave() {
-    if (!type || !km || !value) {
-      Alert.alert("Ops!", "Preencha todos os campos.");
+    if (!type || !value) {
+      Alert.alert("Ops!", "Preencha tipo e valor.");
       return;
     }
-
+    const vehicleId = await getActiveVehicleId();
+    if (!vehicleId) {
+      Alert.alert("Atenção", "Cadastre um veículo em Meu Carro antes de adicionar manutenções.");
+      return;
+    }
     setLoading(true);
-
-    // O comando mágico de inserção
-    const { error } = await supabase
-      .from('manutencoes')
-      .insert({
-        tipo: type,
-        km: Number(km),   // Convertendo texto para número
-        valor: Number(value.replace(',', '.')), // Aceita vírgula ou ponto
-        data: date
-      });
-
+    const { error } = await supabase.from('manutencoes').insert({
+      vehicle_id: vehicleId,
+      tipo: type,
+      km: km ? Number(km.replace(/\D/g, '')) : null,
+      valor: Number(value.replace(',', '.')),
+      data: toISODate(date),
+    });
     setLoading(false);
-
     if (error) {
-      Alert.alert("Erro", "Não foi possível salvar: " + error.message);
+      Alert.alert("Erro", error.message);
     } else {
       Alert.alert("Sucesso!", "Manutenção registrada.");
-      router.back(); // Volta para a tela anterior
+      router.back();
     }
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <View className="flex-row items-center px-5 py-4 border-b border-gray-100">
         <TouchableOpacity onPress={() => router.back()} className="p-2 -ml-2">
           <ArrowLeft size={24} color="#4A4A4A" />
         </TouchableOpacity>
-        <Text className="text-xl font-bold text-glam-dark ml-2">Novo Serviço</Text>
+        <Text style={[typography.screenTitle, { color: colors.text, marginLeft: 8 }]}>Novo Serviço</Text>
       </View>
 
       <ScrollView className="flex-1 px-5 pt-6">
@@ -59,7 +60,7 @@ export default function AddMaintenanceScreen() {
         <View className="mb-5">
           <Text className="text-glam-dark font-bold mb-2 ml-1">O que foi feito?</Text>
           <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 h-14">
-            <Wrench size={20} color="#E91E63" />
+            <Wrench size={20} color={colors.accent} />
             <TextInput 
               className="flex-1 ml-3 text-gray-700 text-base"
               placeholder="Ex: Troca de Óleo"
@@ -103,11 +104,7 @@ export default function AddMaintenanceScreen() {
           <Text className="text-glam-dark font-bold mb-2 ml-1">Data</Text>
           <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-2xl px-4 h-14 opacity-60">
             <Calendar size={20} color="#9E9E9E" />
-            <TextInput 
-              className="flex-1 ml-3 text-gray-700 text-base"
-              value={date}
-              editable={false}
-            />
+            <Text className="flex-1 ml-3 text-gray-700 text-base">{formatBR(date)}</Text>
           </View>
         </View>
 

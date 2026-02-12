@@ -1,141 +1,96 @@
 import { useRouter } from 'expo-router';
-import { FileCheck, MessageCircle } from 'lucide-react-native';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ChevronRight, FileCheck, MessageCircle } from 'lucide-react-native';
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BrilhoIcon, ChavesIcon } from '../components/icons';
 import { colors } from '../src/theme/colors';
+import { sectionPlaneTint } from '../src/theme/design-patterns';
+import { typography } from '../src/theme/typography';
 
 export default function IAModuleScreen() {
   const router = useRouter();
 
+  const items = [
+    {
+      id: 'verificador',
+      icon: <FileCheck size={24} color={colors.iconOnAccent} strokeWidth={2} />,
+      iconBg: colors.accent,
+      title: 'Verificador de Laudos',
+      subtitle: 'Analise orçamentos e laudos antes de autorizar serviços',
+      onPress: () => router.push('/verificador-laudos'),
+    },
+    {
+      id: 'leninha',
+      icon: <MessageCircle size={24} color={colors.iconPrimary} strokeWidth={2} />,
+      iconBg: colors.accentSoft,
+      title: 'Leninha',
+      subtitle: 'Assistente IA – tire dúvidas sobre o seu carro',
+      onPress: () => router.push('/ai/manual-chat'),
+    },
+    {
+      id: 'duvidas',
+      icon: <ChavesIcon size={24} color={colors.iconPrimary} />,
+      iconBg: colors.accentSoft,
+      title: 'Dúvidas sobre orçamentos',
+      subtitle: 'Manual do carro e histórico para orientar em serviços mecânicos',
+      onPress: () => router.push('/ai/manual-chat'),
+    },
+  ];
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}
+        contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="flex-row items-center mb-6">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            style={{ marginRight: 12, padding: 8 }}
-          >
-            <Text style={{ color: colors.headerBg, fontFamily: 'Inter_400Regular' }} className="text-base">Voltar</Text>
+        {/* Header – neutro, fundo claro, título escuro */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 24, paddingHorizontal: 0 }}>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12, padding: 8 }}>
+            <Text style={{ color: colors.textPrimary, fontFamily: 'Inter_400Regular', fontSize: 15 }}>Voltar</Text>
           </TouchableOpacity>
-          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.rosaClaro, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-              <BrilhoIcon size={24} color={colors.iconPrimary} />
-            </View>
-            <View>
-              <Text style={{ color: colors.rosaEscuro, fontFamily: 'LoveloBlack', textTransform: 'uppercase' }} className="text-xl font-bold">
-                Assistente Leninha
-              </Text>
-              <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm">
-                Verificador, Leninha e dúvidas
-              </Text>
-            </View>
+          <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+            <BrilhoIcon size={24} color={colors.accent} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={[typography.screenTitle, { color: colors.textPrimary, fontSize: 22 }]}>Assistente Leninha</Text>
+            <Text style={[typography.screenSubtitle, { color: colors.textSecondary, marginTop: 4 }]}>Verificador, Leninha e dúvidas</Text>
           </View>
         </View>
 
-        <View style={{ backgroundColor: colors.cardBg, borderWidth: 1, borderColor: colors.rosaMedio, borderRadius: 16, padding: 4, marginBottom: 16 }}>
-          <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-xs px-2 py-1">
+        {/* Intro – plano surfaceTint, sem card */}
+        <View style={[sectionPlaneTint, { borderRadius: 12, marginBottom: 20 }]}>
+          <Text style={{ color: colors.textSecondary, fontFamily: 'Inter_400Regular', fontSize: 13 }}>
             Escolha uma opção abaixo. Em breve: respostas com IA usando o manual do seu carro e histórico.
           </Text>
         </View>
 
-        <TouchableOpacity
-          onPress={() => router.push('/verificador-laudos')}
-          style={{
-            backgroundColor: colors.cardBg,
-            borderWidth: 2,
-            borderColor: colors.headerBg,
-            borderRadius: 20,
-            padding: 20,
-            marginBottom: 12,
-            flexDirection: 'row',
-            alignItems: 'center',
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-            elevation: 4,
-          }}
-          activeOpacity={0.8}
-        >
-          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: colors.headerBg, alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
-            <FileCheck size={26} color={colors.iconOnAccent} strokeWidth={2} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} className="text-lg font-bold">
-              Verificador de Laudos
-            </Text>
-            <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm mt-1">
-              Analise orçamentos e laudos antes de autorizar serviços
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => router.push('/ai/manual-chat')}
-          style={{
-            backgroundColor: colors.cardBg,
-            borderWidth: 1,
-            borderColor: colors.rosaMedio,
-            borderRadius: 20,
-            padding: 20,
-            marginBottom: 12,
-            flexDirection: 'row',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 6,
-            elevation: 2,
-          }}
-          activeOpacity={0.8}
-        >
-          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: colors.rosaClaro, alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
-            <MessageCircle size={26} color={colors.iconPrimary} strokeWidth={2} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} className="text-lg font-bold">
-              Leninha
-            </Text>
-            <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm mt-1">
-              Assistente IA da Oficina Glam – tire dúvidas sobre o seu carro
-            </Text>
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => router.push('/ai/manual-chat')}
-          style={{
-            backgroundColor: colors.cardBg,
-            borderWidth: 1,
-            borderColor: colors.rosaMedio,
-            borderRadius: 20,
-            padding: 20,
-            flexDirection: 'row',
-            alignItems: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.06,
-            shadowRadius: 6,
-            elevation: 2,
-          }}
-          activeOpacity={0.8}
-        >
-          <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: colors.rosaClaro, alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
-            <ChavesIcon size={26} color={colors.iconPrimary} />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} className="text-lg font-bold">
-              Dúvidas sobre orçamentos
-            </Text>
-            <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-sm mt-1">
-              Manual do carro e histórico para orientar em serviços mecânicos
-            </Text>
-          </View>
-        </TouchableOpacity>
+        {/* Lista – plano surfaceTint, linhas com divisores, sem cards brancos */}
+        <View style={[sectionPlaneTint, { borderRadius: 12, paddingVertical: 0 }]}>
+          {items.map((item, idx) => (
+            <Pressable
+              key={item.id}
+              onPress={item.onPress}
+              style={({ pressed }) => ({
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingVertical: 18,
+                paddingHorizontal: 20,
+                borderTopWidth: idx === 0 ? 0 : 1,
+                borderTopColor: colors.border,
+                transform: [{ scale: pressed ? 0.99 : 1 }],
+              })}
+            >
+              <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: item.iconBg, alignItems: 'center', justifyContent: 'center', marginRight: 16 }}>
+                {item.icon}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ color: colors.text, fontFamily: 'Inter_600SemiBold', fontSize: 16 }}>{item.title}</Text>
+                <Text style={{ color: colors.textTertiary, fontFamily: 'Inter_400Regular', fontSize: 13, marginTop: 2 }}>{item.subtitle}</Text>
+              </View>
+              <ChevronRight size={20} color={colors.textTertiary} />
+            </Pressable>
+          ))}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

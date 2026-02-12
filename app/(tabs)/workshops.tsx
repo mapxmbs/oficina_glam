@@ -1,80 +1,57 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from 'expo-router';
 import { Bot, Clock, DollarSign, Filter, Heart, HelpCircle, Image as ImageIcon, Mail, Map, MapPin, MessageCircle, MessageSquare, Phone, Search, Star, X } from 'lucide-react-native';
-import { useCallback, useEffect, useState } from 'react';
-import { Image, Linking, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Image, Linking, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { supabase } from '../../lib/supabase';
 import { colors } from '../../src/theme/colors';
+import { cardContent, chipActive, chipBase, headerMinimal, spacing } from '../../src/theme/design-patterns';
+import { typography } from '../../src/theme/typography';
 
-// MOCK: Oficinas da Rede Glam
-const WORKSHOPS = [
-  {
-    id: 1,
-    name: "Oficina Mecânica da Ana",
-    address: "Av. Paulista, 1000 - Bela Vista, São Paulo/SP",
-    city: "São Paulo",
-    uf: "SP",
-    rating: 4.9,
-    reviews: 128,
-    image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1000&auto=format&fit=crop",
-    services: ["Troca de Óleo", "Freios", "Suspensão"],
-    basePrice: "R$ 150",
-    whatsapp: "5511999999999",
-    phone: "(11) 9999-9999",
-    horario: "Seg-Sex: 8h-18h | Sáb: 8h-12h",
-    category: "geral"
-  },
-  {
-    id: 2,
-    name: "Auto Center Premium",
-    address: "Rua Augusta, 500 - Consolação, São Paulo/SP",
-    city: "São Paulo",
-    uf: "SP",
-    rating: 4.5,
-    reviews: 84,
-    image: "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?q=80&w=1000&auto=format&fit=crop",
-    services: ["Alinhamento", "Balanceamento", "Elétrica"],
-    basePrice: "R$ 120",
-    whatsapp: "5511988888888",
-    phone: "(11) 9888-8888",
-    horario: "Seg-Sex: 7h-19h",
-    category: "especializada"
-  },
-  {
-    id: 3,
-    name: "Garage Girls Especializada",
-    address: "Rua Oscar Freire, 200 - Jardins, São Paulo/SP",
-    city: "São Paulo",
-    uf: "SP",
-    rating: 5.0,
-    reviews: 312,
-    image: "https://images.unsplash.com/photo-1597505294881-133d45661d7e?q=80&w=1000&auto=format&fit=crop",
-    services: ["Motor", "Câmbio", "Injeção Eletrônica"],
-    basePrice: "R$ 200",
-    whatsapp: "5511977777777",
-    phone: "(11) 9777-7777",
-    horario: "Seg-Sex: 8h-17h",
-    category: "5estrelas"
-  },
-  {
-    id: 4,
-    name: "Oficina da Diva - Rio",
-    address: "Av. Atlântica, 3000 - Copacabana, Rio de Janeiro/RJ",
-    city: "Rio de Janeiro",
-    uf: "RJ",
-    rating: 4.8,
-    reviews: 256,
-    image: "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1000&auto=format&fit=crop",
-    services: ["Troca de Óleo", "Freios", "Ar Condicionado"],
-    basePrice: "R$ 180",
-    whatsapp: "5521987654321",
-    phone: "(21) 9876-5432",
-    horario: "Seg-Sáb: 8h-18h",
-    category: "geral"
-  }
-];
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1000&auto=format&fit=crop';
+
+type WorkshopItem = {
+  id: number;
+  name: string;
+  address: string;
+  city: string;
+  uf: string;
+  rating: number | null;
+  reviews?: number;
+  image: string;
+  services: string[];
+  basePrice: string;
+  whatsapp: string;
+  phone: string;
+  horario: string;
+  category: string;
+};
 
 const FAVORITES_KEY = '@glam_workshop_favorites';
 const LAST_USED_KEY = '@glam_last_workshop';
+
+function mapOficinaToWorkshop(raw: any): WorkshopItem {
+  const horarioSeg = raw.horario_seg_sex || '';
+  const horarioSab = raw.horario_sabado || '';
+  const horario = [horarioSeg, horarioSab].filter(Boolean).join(' | ') || 'Consultar';
+  const uf = typeof raw.estado === 'string' ? raw.estado.trim() : String(raw.estado || '');
+  return {
+    id: raw.id,
+    name: raw.nome || 'Oficina',
+    address: raw.endereco || '',
+    city: raw.cidade || '',
+    uf: uf.length >= 2 ? uf : uf,
+    rating: null,
+    image: PLACEHOLDER_IMAGE,
+    services: [],
+    basePrice: 'Consultar',
+    whatsapp: raw.whatsapp || raw.telefone || '',
+    phone: raw.telefone || '',
+    horario,
+    category: raw.tipo || 'loja',
+  };
+}
 
 export default function WorkshopsScreen() {
   const [filter, setFilter] = useState('todos');
@@ -84,6 +61,33 @@ export default function WorkshopsScreen() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [lastUsedId, setLastUsedId] = useState<number | null>(null);
   const [vehicleData, setVehicleData] = useState({ modelo: 'Honda Civic', placa: 'ABC-1234' });
+  const [workshops, setWorkshops] = useState<WorkshopItem[]>([]);
+  const [loadingWorkshops, setLoadingWorkshops] = useState(true);
+
+  const fetchWorkshops = useCallback(async () => {
+    setLoadingWorkshops(true);
+    try {
+      const { data, error } = await supabase
+        .from('oficinas')
+        .select('*')
+        .eq('ativo', true)
+        .order('nome');
+      if (!error && data) {
+        setWorkshops(data.map(mapOficinaToWorkshop));
+      } else {
+        setWorkshops([]);
+      }
+    } catch (e) {
+      console.warn('Erro ao buscar oficinas:', e);
+      setWorkshops([]);
+    } finally {
+      setLoadingWorkshops(false);
+    }
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    fetchWorkshops();
+  }, [fetchWorkshops]));
 
   const loadFavorites = useCallback(async () => {
     try {
@@ -129,7 +133,13 @@ export default function WorkshopsScreen() {
     Linking.openURL(`https://wa.me/551199999999?text=${message}`); // Número SAC Glam (mock)
   };
 
-  const filteredWorkshops = WORKSHOPS.filter(w => {
+  /** Estados onde existem lojas da rede Glam (derivado dos dados) */
+  const availableUFs = useMemo(() => {
+    const ufs = [...new Set(workshops.map((w) => w.uf).filter(Boolean))].sort();
+    return ['Todos', ...ufs];
+  }, [workshops]);
+
+  const filteredWorkshops = workshops.filter(w => {
     let matchesFilter = true;
     let matchesCity = true;
     let matchesUF = true;
@@ -139,12 +149,10 @@ export default function WorkshopsScreen() {
     else if (filter === 'especializada') matchesFilter = w.category === 'especializada';
     else if (filter !== 'todos') matchesFilter = false;
 
-    // Filtro por cidade (busca)
     if (searchCity.trim() !== '') {
       matchesCity = w.city.toLowerCase().includes(searchCity.toLowerCase());
     }
 
-    // Filtro por UF
     if (selectedUF !== 'Todos') {
       matchesUF = w.uf === selectedUF;
     }
@@ -154,129 +162,88 @@ export default function WorkshopsScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView className="flex-1 px-5 pt-4">
+      <ScrollView 
+        className="flex-1" 
+        contentContainerStyle={{ paddingHorizontal: spacing.screenPadding, paddingTop: spacing.screenPaddingTop, paddingBottom: spacing.screenPaddingBottom + spacing.tabBarBottom }}
+        showsVerticalScrollIndicator={false}
+      >
 
-        {/* HEADER GLAM COM GRADIENTE */}
-        <View 
-          style={{ 
-            backgroundColor: colors.headerBg,
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.2,
-            shadowRadius: 8,
-            elevation: 4
-          }}
-          className="p-5 rounded-3xl mb-6 relative overflow-hidden"
-        >
-          <View 
-            style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} 
-            className="absolute -right-10 -top-10 w-32 h-32 rounded-full"
-          />
-          
-          <View className="relative z-10">
-            <Text 
-              style={{ 
-                fontFamily: 'Inter_700Bold',
-                textTransform: 'uppercase'
-              }} 
-              className="text-white text-3xl font-bold mb-1"
-            >
-              Rede Glam
-            </Text>
-            <Text 
-              style={{ fontFamily: 'Inter_400Regular' }} 
-              className="text-white opacity-90 text-sm mb-4"
-            >
+        {/* Header minimalista – padrão das outras abas */}
+        <View style={[headerMinimal, { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }]}>
+          <View>
+            <Text style={[typography.screenTitle, { color: colors.text }]}>Rede Glam</Text>
+            <Text style={[typography.screenSubtitle, { color: colors.textTertiary, marginTop: 4 }]}>
               Oficinas verificadas e seguras
             </Text>
+          </View>
+          <TouchableOpacity
+            onPress={() => setShowSAC(true)}
+            style={{
+              backgroundColor: 'transparent',
+              borderWidth: 1.5,
+              borderColor: colors.accent,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingVertical: 10,
+              paddingHorizontal: 14,
+              borderRadius: 12,
+            }}
+          >
+            <MessageSquare size={18} color={colors.accent} />
+            <Text style={{ color: colors.accent, fontFamily: 'Inter_600SemiBold', marginLeft: 6, fontSize: 13 }}>
+              SAC
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-            {/* Botão SAC Estratégico */}
-            <TouchableOpacity
-              onPress={() => setShowSAC(true)}
-              style={{ backgroundColor: 'rgba(255,255,255,0.25)' }}
-              className="flex-row items-center justify-center p-3 rounded-xl"
-              activeOpacity={0.8}
-            >
-              <MessageSquare size={18} color={colors.iconPrimary} />
-              <Text 
-                style={{ color: colors.iconPrimary, fontFamily: 'Inter_600SemiBold' }}
-                className="font-bold ml-2"
-              >
-                SAC Glam - Fale Conosco
-              </Text>
-            </TouchableOpacity>
+        {/* Aviso */}
+        <View style={[cardContent, { flexDirection: 'row', alignItems: 'flex-start', marginBottom: spacing.blockGap }]}>
+          <Map size={20} color={colors.accent} style={{ marginRight: 12 }} />
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: colors.textPrimary, marginBottom: 4 }}>
+              Em breve: Mapa e Proximidade
+            </Text>
+            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: colors.textSecondary }}>
+              Mapa interativo e notificação por proximidade (com sua permissão).
+            </Text>
           </View>
         </View>
 
-        {/* AVISO DE FUNCIONALIDADES FUTURAS */}
-        <View 
-          style={{ 
-            backgroundColor: colors.surface,
-            borderColor: colors.rosaMedio
-          }}
-          className="p-4 rounded-2xl border mb-6"
-        >
-          <View className="flex-row items-start">
-            <Map size={20} color={colors.headerBg} />
-            <View className="flex-1 ml-3">
-              <Text 
-                style={{ color: colors.rosaEscuro, fontFamily: 'Inter_600SemiBold' }} 
-                className="font-bold text-sm mb-1"
-              >
-                Em breve: Mapa e Proximidade
-              </Text>
-              <Text 
-                style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} 
-                className="text-xs"
-              >
-                Mapa interativo e notificação por proximidade (com sua permissão).
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        {/* FILTROS INTELIGENTES */}
-        <View 
-          style={{ 
-            backgroundColor: colors.surface,
-            shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 10,
-            elevation: 4
-          }}
-          className="p-4 rounded-3xl mb-6"
-        >
-          <View className="flex-row items-center mb-4">
-            <Filter size={20} color={colors.headerBg} />
-            <Text 
-              style={{ 
-                color: colors.rosaEscuro,
-                fontFamily: 'Inter_600SemiBold' 
-              }} 
-              className="font-bold text-base ml-2"
-            >
-              Filtros de Busca
+        {/* Filtros – bloco branco elegante */}
+        <View style={[cardContent, { marginBottom: spacing.blockGap }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 16 }}>
+            <Filter size={20} color={colors.accent} />
+            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 16, color: colors.textPrimary, marginLeft: 10 }}>
+              Filtros
             </Text>
           </View>
 
           {/* Busca por Cidade */}
-          <View className="mb-3">
+          <View style={{ marginBottom: 16 }}>
             <Text 
               style={{ 
-                color: colors.textLight,
-                fontFamily: 'Inter_600SemiBold' 
-              }} 
-              className="text-xs uppercase font-bold mb-2"
+                color: colors.textSecondary,
+                fontFamily: 'Inter_500Medium',
+                fontSize: 12,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                marginBottom: 8,
+              }}
             >
-              Buscar por Cidade
+              Buscar por cidade
             </Text>
             <View 
               style={{ 
-                backgroundColor: colors.rosaSuper,
-                borderColor: colors.rosaMedio
+                backgroundColor: colors.surface,
+                borderWidth: 1,
+                borderColor: colors.border,
+                flexDirection: 'row',
+                alignItems: 'center',
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 12,
               }}
-              className="flex-row items-center px-4 py-3 rounded-xl border"
             >
               <Search size={18} color={colors.textLight} />
               <TextInput
@@ -294,34 +261,33 @@ export default function WorkshopsScreen() {
             </View>
           </View>
 
-          {/* Filtro por UF */}
-          <View className="mb-3">
+          {/* Filtro por UF – somente estados com lojas Glam */}
+          <View style={{ marginBottom: 16 }}>
             <Text 
               style={{ 
-                color: colors.textLight,
-                fontFamily: 'Inter_600SemiBold' 
-              }} 
-              className="text-xs uppercase font-bold mb-2"
+                color: colors.textSecondary,
+                fontFamily: 'Inter_500Medium',
+                fontSize: 12,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                marginBottom: 8,
+              }}
             >
-              Estado (UF)
+              Estado
             </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {['Todos', 'SP', 'RJ', 'MG', 'RS', 'BA'].map((uf) => (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+              {availableUFs.map((uf: string) => (
                 <TouchableOpacity
                   key={uf}
                   onPress={() => setSelectedUF(uf)}
-                  style={{ 
-                    backgroundColor: selectedUF === uf ? colors.accentSoft : colors.surface,
-                    borderColor: selectedUF === uf ? colors.accentSoft : colors.rosaMedio
-                  }}
-                  className="px-4 py-2 rounded-full mr-2 border"
+                  style={[selectedUF === uf ? chipActive : chipBase, { marginRight: 8 }]}
                 >
-                  <Text 
-                    style={{ 
-                      color: selectedUF === uf ? colors.iconPrimary : colors.text,
-                      fontFamily: 'Inter_600SemiBold' 
+                  <Text
+                    style={{
+                      color: selectedUF === uf ? colors.iconOnAccent : colors.textSecondary,
+                      fontFamily: selectedUF === uf ? 'Inter_600SemiBold' : 'Inter_500Medium',
+                      fontSize: 13,
                     }}
-                    className="font-bold text-sm"
                   >
                     {uf}
                   </Text>
@@ -334,25 +300,23 @@ export default function WorkshopsScreen() {
           <View>
             <Text 
               style={{ 
-                color: colors.textLight,
-                fontFamily: 'Inter_600SemiBold' 
-              }} 
-              className="text-xs uppercase font-bold mb-2"
+                color: colors.textSecondary,
+                fontFamily: 'Inter_500Medium',
+                fontSize: 12,
+                textTransform: 'uppercase',
+                letterSpacing: 0.5,
+                marginBottom: 8,
+              }}
             >
               Categoria
             </Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
               <TouchableOpacity 
                 onPress={() => setFilter('todos')}
-                style={{ 
-                  backgroundColor: filter === 'todos' ? colors.accentSoft : colors.surface,
-                  borderColor: filter === 'todos' ? colors.accentSoft : colors.rosaMedio
-                }}
-                className="px-4 py-2 rounded-full mr-2 border"
+                style={[filter === 'todos' ? chipActive : chipBase, { marginRight: 8 }]}
               >
                 <Text 
-                  style={{ color: filter === 'todos' ? colors.iconPrimary : colors.text, fontFamily: 'Inter_600SemiBold' }}
-                  className="font-bold text-sm"
+                  style={{ color: filter === 'todos' ? colors.iconOnAccent : colors.textSecondary, fontFamily: filter === 'todos' ? 'Inter_600SemiBold' : 'Inter_500Medium', fontSize: 13 }}
                 >
                   Todas
                 </Text>
@@ -360,16 +324,11 @@ export default function WorkshopsScreen() {
 
               <TouchableOpacity 
                 onPress={() => setFilter('favoritas')}
-                style={{ 
-                  backgroundColor: filter === 'favoritas' ? colors.accentSoft : colors.surface,
-                  borderColor: filter === 'favoritas' ? colors.accentSoft : colors.rosaMedio
-                }}
-                className="px-4 py-2 rounded-full mr-2 border flex-row items-center"
+                style={[filter === 'favoritas' ? chipActive : chipBase, { marginRight: 8, flexDirection: 'row', alignItems: 'center' }]}
               >
-                <Heart size={14} color={filter === 'favoritas' ? colors.iconPrimary : colors.text} fill={filter === 'favoritas' ? colors.iconPrimary : 'transparent'} />
+                <Heart size={14} color={filter === 'favoritas' ? colors.iconOnAccent : colors.text} fill={filter === 'favoritas' ? colors.iconOnAccent : 'transparent'} />
                 <Text 
-                  style={{ color: filter === 'favoritas' ? colors.iconPrimary : colors.text, fontFamily: 'Inter_600SemiBold', marginLeft: 4 }}
-                  className="font-bold text-sm"
+                  style={{ color: filter === 'favoritas' ? colors.iconOnAccent : colors.textSecondary, fontFamily: filter === 'favoritas' ? 'Inter_600SemiBold' : 'Inter_500Medium', marginLeft: 6, fontSize: 13 }}
                 >
                   Favoritas
                 </Text>
@@ -377,18 +336,14 @@ export default function WorkshopsScreen() {
 
               <TouchableOpacity 
                 onPress={() => setFilter('5estrelas')}
-                style={{ 
-                  backgroundColor: filter === '5estrelas' ? colors.accentSoft : colors.surface,
-                  borderColor: filter === '5estrelas' ? colors.accentSoft : colors.rosaMedio
-                }}
-                className="px-4 py-2 rounded-full mr-2 border"
+                style={[filter === '5estrelas' ? chipActive : chipBase, { marginRight: 8 }]}
               >
                 <Text 
                   style={{ 
-                    color: filter === '5estrelas' ? colors.iconPrimary : colors.text,
-                    fontFamily: 'Inter_600SemiBold' 
+                    color: filter === '5estrelas' ? colors.iconOnAccent : colors.textSecondary,
+                    fontFamily: filter === '5estrelas' ? 'Inter_600SemiBold' : 'Inter_500Medium',
+                    fontSize: 13,
                   }}
-                  className="font-bold text-sm"
                 >
                   5 Estrelas
                 </Text>
@@ -396,18 +351,14 @@ export default function WorkshopsScreen() {
 
               <TouchableOpacity 
                 onPress={() => setFilter('especializada')}
-                style={{ 
-                  backgroundColor: filter === 'especializada' ? colors.accentSoft : colors.surface,
-                  borderColor: filter === 'especializada' ? colors.accentSoft : colors.rosaMedio
-                }}
-                className="px-4 py-2 rounded-full mr-2 border"
+                style={[filter === 'especializada' ? chipActive : chipBase, { marginRight: 8 }]}
               >
                 <Text 
                   style={{ 
-                    color: filter === 'especializada' ? colors.iconPrimary : colors.text,
-                    fontFamily: 'Inter_600SemiBold' 
+                    color: filter === 'especializada' ? colors.iconOnAccent : colors.textSecondary,
+                    fontFamily: filter === 'especializada' ? 'Inter_600SemiBold' : 'Inter_500Medium',
+                    fontSize: 13,
                   }}
-                  className="font-bold text-sm"
                 >
                   Especializadas
                 </Text>
@@ -416,12 +367,11 @@ export default function WorkshopsScreen() {
           </View>
         </View>
 
-        {/* Sugestão última loja */}
-        {lastUsedId && WORKSHOPS.find((w) => w.id === lastUsedId) && (
+        {lastUsedId && workshops.find((w) => w.id === lastUsedId) && (
           <View style={{ backgroundColor: colors.accentSoft, padding: 12, borderRadius: 12, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
             <MapPin size={18} color={colors.iconPrimary} />
             <Text style={{ color: colors.textSecondary, fontFamily: 'Inter_400Regular', fontSize: 12, marginLeft: 8, flex: 1 }}>
-              Última loja usada: {WORKSHOPS.find((w) => w.id === lastUsedId)?.name}
+              Última loja usada: {workshops.find((w) => w.id === lastUsedId)?.name}
             </Text>
           </View>
         )}
@@ -435,7 +385,12 @@ export default function WorkshopsScreen() {
         </Text>
 
         {/* LISTA DE OFICINAS */}
-        {filteredWorkshops.length === 0 ? (
+        {loadingWorkshops ? (
+          <View style={{ padding: 32, alignItems: 'center' }}>
+            <ActivityIndicator size="large" color={colors.accent} />
+            <Text style={{ color: colors.textTertiary, fontFamily: 'Inter_400Regular', fontSize: 14, marginTop: 12 }}>Carregando oficinas…</Text>
+          </View>
+        ) : filteredWorkshops.length === 0 ? (
           <View 
             style={{ backgroundColor: colors.surface }}
             className="p-8 rounded-3xl items-center"
@@ -467,9 +422,9 @@ export default function WorkshopsScreen() {
               style={{ 
                 backgroundColor: colors.surface,
                 shadowColor: colors.rosaInteso,
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 10,
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
+                shadowRadius: 8,
                 elevation: 4
               }}
               className="rounded-3xl mb-6 overflow-hidden"
@@ -490,7 +445,7 @@ export default function WorkshopsScreen() {
                   <Heart size={18} color={favorites.includes(item.id) ? colors.accent : colors.textSecondary} fill={favorites.includes(item.id) ? colors.accent : 'transparent'} />
                 </TouchableOpacity>
 
-                {/* Badge de Avaliação */}
+                {item.rating != null && (
                 <View 
                   style={{ backgroundColor: colors.warning }}
                   className="absolute top-3 right-3 px-3 py-1.5 rounded-full flex-row items-center shadow-lg"
@@ -503,6 +458,7 @@ export default function WorkshopsScreen() {
                     {item.rating}
                   </Text>
                 </View>
+                )}
 
                 {/* Badge "Em Breve: Mais Fotos" */}
                 <View 
@@ -575,6 +531,7 @@ export default function WorkshopsScreen() {
                 </View>
 
                 {/* Tags de Serviços */}
+                {item.services.length > 0 && (
                 <View className="flex-row flex-wrap mb-4">
                   {item.services.map((service, index) => (
                     <View 
@@ -594,6 +551,7 @@ export default function WorkshopsScreen() {
                     </View>
                   ))}
                 </View>
+                )}
 
                 {/* Avaliações */}
                 <View 
@@ -607,7 +565,7 @@ export default function WorkshopsScreen() {
                     }} 
                     className="text-xs text-center"
                   >
-                    {item.reviews} avaliações de DIVAs
+                    {item.reviews ?? 0} avaliações de DIVAs
                   </Text>
                 </View>
 
@@ -616,7 +574,7 @@ export default function WorkshopsScreen() {
                   {/* Botão Principal: Agendar via WhatsApp */}
                   <TouchableOpacity 
                     style={{ 
-                      backgroundColor: '#25D366',
+                      backgroundColor: colors.whatsapp,
                       shadowColor: '#25D366',
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.3,
@@ -740,10 +698,10 @@ export default function WorkshopsScreen() {
                 <TouchableOpacity
                   onPress={openSACWhatsApp}
                   style={{ 
-                    backgroundColor: '#25D366',
+                    backgroundColor: colors.whatsapp,
                     shadowColor: '#25D366',
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.3,
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.05,
                     shadowRadius: 4,
                     elevation: 3
                   }}

@@ -29,6 +29,18 @@ Design system restaurado para a versão elegante e minimalista acordada.
 | `tailwind.config.js` | glam.primary → #B91C5C, glam.light → accentSoft |
 | `app.json` | Splash: logo.png, backgroundColor #F8F7F9 |
 
+## Layout por planos (Jan 2026)
+
+Refatoração estrutural – menos caixinhas brancas, mais planos e hierarquia:
+
+- **design-patterns:** `sectionPlaneTint` (faixa surfaceTint), `listRow`, `divider`; sombras reduzidas; cardPrincipal com sombra leve
+- **Home:** Atalhos como lista em plano surfaceTint (não cards); Dicas em surfaceTint com barra accent; Redes em faixa surfaceTint
+- **Fuel:** Insights e histórico em plano surfaceTint, linhas com divisores
+- **ia-module:** Header accent + lista em plano surfaceTint, sem cards brancos
+- **maintenance:** Itens em surfaceTint com barra accent lateral, sem sombra
+- **workshops:** Header accent sem sombra pesada; aviso em surfaceTint
+- **FloatingChatButton:** sombra reduzida
+
 ## Regras aplicadas
 
 - **Base neutra:** #F8F7F9, #FFFFFF

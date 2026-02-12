@@ -5,6 +5,7 @@ import { Alert, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-n
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../lib/supabase';
 import { colors } from '../src/theme/colors';
+import { typography } from '../src/theme/typography';
 
 // TODO - FUNCIONALIDADES FUTURAS:
 // - Push Notifications nativos (usando expo-notifications)
@@ -135,19 +136,8 @@ export default function NotificationsScreen() {
           <ChevronLeft size={28} color={colors.rosaEscuro} />
         </TouchableOpacity>
         <View className="flex-1">
-          <Text 
-            style={{ 
-              color: colors.rosaEscuro,
-              fontFamily: 'Inter_700Bold',
-              textTransform: 'uppercase' 
-            }} 
-            className="text-xl font-bold"
-          >
-            Lembretes
-          </Text>
-          <Text style={{ color: colors.textLight, fontFamily: 'Inter_400Regular' }} className="text-xs">
-            Mantenha seu carro sempre em dia
-          </Text>
+          <Text style={[typography.screenTitle, { color: colors.text }]}>Lembretes</Text>
+          <Text style={[typography.screenSubtitle, { color: colors.textSecondary, marginTop: 4 }]}>Mantenha seu carro sempre em dia</Text>
         </View>
         <TouchableOpacity>
           <Settings size={24} color={colors.headerBg} />
@@ -161,9 +151,9 @@ export default function NotificationsScreen() {
           style={{ 
             backgroundColor: colors.headerBg,
             shadowColor: colors.rosaInteso,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.05,
+            shadowRadius: 6,
             elevation: 4
           }}
           className="rounded-2xl p-5 mb-6"
@@ -178,7 +168,7 @@ export default function NotificationsScreen() {
             </Text>
           </View>
           
-          <Text style={{ fontFamily: 'MontserratAlternates-Medium' }} className="text-white text-2xl font-bold mb-2">
+          <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-white text-2xl font-bold mb-2">
             Revisão dos 10.000 km
           </Text>
           
@@ -192,7 +182,7 @@ export default function NotificationsScreen() {
               style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
               className="flex-1 py-3 rounded-xl items-center"
             >
-              <Text style={{ fontFamily: 'MontserratAlternates-Medium' }} className="text-white font-bold">
+              <Text style={{ fontFamily: 'Inter_500Medium' }} className="text-white font-bold">
                 Já fiz
               </Text>
             </TouchableOpacity>
@@ -202,7 +192,7 @@ export default function NotificationsScreen() {
               style={{ backgroundColor: 'white' }}
               className="flex-1 py-3 rounded-xl items-center"
             >
-              <Text style={{ color: colors.headerBg, fontFamily: 'MontserratAlternates-Medium' }} className="font-bold">
+              <Text style={{ color: colors.headerBg, fontFamily: 'Inter_500Medium' }} className="font-bold">
                 Agendar
               </Text>
             </TouchableOpacity>
@@ -213,7 +203,7 @@ export default function NotificationsScreen() {
         <Text 
           style={{ 
             color: colors.rosaEscuro,
-            fontFamily: 'MontserratAlternates-Medium' 
+            fontFamily: 'Inter_500Medium' 
           }} 
           className="text-lg font-bold mb-3"
         >
@@ -241,7 +231,7 @@ export default function NotificationsScreen() {
               <Text 
                 style={{ 
                   color: colors.text,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="font-bold text-base mb-1"
               >
@@ -280,7 +270,7 @@ export default function NotificationsScreen() {
           <Text 
             style={{ 
               color: colors.headerBg,
-              fontFamily: 'MontserratAlternates-Medium' 
+              fontFamily: 'Inter_500Medium' 
             }} 
             className="font-bold ml-2"
           >
@@ -292,7 +282,7 @@ export default function NotificationsScreen() {
         <Text 
           style={{ 
             color: colors.rosaEscuro,
-            fontFamily: 'MontserratAlternates-Medium' 
+            fontFamily: 'Inter_500Medium' 
           }} 
           className="text-lg font-bold mb-3 mt-4"
         >
@@ -318,7 +308,7 @@ export default function NotificationsScreen() {
               <Text 
                 style={{ 
                   color: colors.text,
-                  fontFamily: 'MontserratAlternates-Medium' 
+                  fontFamily: 'Inter_500Medium' 
                 }} 
                 className="font-bold mb-1"
               >
@@ -343,7 +333,7 @@ export default function NotificationsScreen() {
             <Text 
               style={{ 
                 color: colors.rosaInteso,
-                fontFamily: 'MontserratAlternates-Medium' 
+                fontFamily: 'Inter_500Medium' 
               }} 
               className="font-bold text-xs"
             >
@@ -364,7 +354,7 @@ export default function NotificationsScreen() {
           <Text 
             style={{ 
               color: colors.rosaInteso,
-              fontFamily: 'MontserratAlternates-Medium' 
+              fontFamily: 'Inter_500Medium' 
             }} 
             className="font-bold mb-2"
           >

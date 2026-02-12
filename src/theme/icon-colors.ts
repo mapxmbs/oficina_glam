@@ -7,7 +7,7 @@
 
 import { colors } from './colors';
 
-export type IconVariant = 'primary' | 'onAccent' | 'neutral' | 'muted';
+export type IconVariant = 'primary' | 'onAccent' | 'neutral' | 'muted' | 'inactive';
 
 /** Mapeia variant para a cor correta do ícone */
 export function getIconColor(variant: IconVariant): string {
@@ -20,6 +20,8 @@ export function getIconColor(variant: IconVariant): string {
       return colors.iconNeutral;
     case 'muted':
       return colors.iconMuted;
+    case 'inactive':
+      return colors.iconInactive;
     default:
       return colors.iconPrimary;
   }
@@ -31,6 +33,7 @@ export const iconVariantContext = {
   onAccent: colors.iconOnAccent,
   neutral: colors.iconNeutral,
   muted: colors.iconMuted,
+  inactive: colors.iconInactive,
 } as const;
 
 export type BackgroundVariant = 'accent' | 'accentSoft' | 'surface' | 'background';

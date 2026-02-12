@@ -33,22 +33,22 @@
 | `border`      | `#EBE8EC` | Bordas sutis              |
 | `borderMedium`| `#DFDBE0` | Bordas mais visíveis      |
 
-### Texto
+### Texto (contraste AA)
 
 | Token         | Hex       | Uso                       |
 |---------------|-----------|---------------------------|
-| `text`        | `#0F0F0F` | Texto principal (alto contraste) |
-| `textSecondary` | `#5C5C5C` | Labels, descrições      |
-| `textTertiary`  | `#8E8E8E` | Placeholders, auxiliar  |
+| `textPrimary` | `#1A1A1A` | Títulos, texto principal  |
+| `textHigh`    | `#2D2D2F` | Alta ênfase               |
+| `textMedium`  | `#5C5C5E` | Subtítulos, labels        |
+| `textLow`     | `#6B6B6E` | Microcopy (mín. 0.4 eq.)  |
 
-### Ícones (contraste por contexto)
+### Ícones
 
 | Token         | Hex       | Uso                                              |
 |---------------|-----------|--------------------------------------------------|
-| `iconPrimary` | `#B91C5C` | Fundo claro (surface, background, accentSoft)   |
-| `iconOnAccent`| `#FFFFFF` | Fundo accent (CTA, card principal, FAB)         |
-| `iconNeutral` | `#0F0F0F` | Contexto neutro, sem destaque                   |
-| `iconMuted`   | `#8E8E8E` | Inativo (tab não selecionada, desabilitado)    |
+| `iconPrimary` | `#8B2942` | Ativo, fundo claro                               |
+| `iconOnAccent`| `#FFFFFF` | Fundo accent (CTA, FAB)                          |
+| `iconMuted` / `iconInactive` | `#5C5C5E` | Inativo (tab, desabilitado)      |
 
 **Regra:** Fundo claro → ícone escuro ou accent; fundo accent → ícone branco. Nunca branco em ícones sobre surface, background ou accentSoft.
 
@@ -128,9 +128,44 @@ BrilhoIcon, ChavesIcon, CoroaIcon, PneuIcon aceitam `color` e usam `colors.iconP
 
 ---
 
+## 3.5 Tokens estruturais (radius, sombra, espaçamento)
+
+### Radius (padrão único global)
+| Token   | Valor | Uso                        |
+|---------|-------|----------------------------|
+| `radius.sm` | 10  | Chips, ícones pequenos     |
+| `radius.md` | 14  | Botões, inputs, chips ativos |
+| `radius.lg` | 20  | Cards, blocos              |
+| `radius.xl` | 24  | Cards grandes, modais      |
+
+### Sombras (opacidade 0.04–0.06, offset 1–2px)
+| Token      | Uso                           |
+|------------|-------------------------------|
+| `shadow.sm` | Elementos compactos           |
+| `shadow.md` | Cards (padrão)                |
+| `shadow.lg` | Destaque                      |
+| `shadow.cta`| Botões CTA                    |
+
+### Espaçamento vertical
+| Token        | Uso                              |
+|--------------|-----------------------------------|
+| `blockGap`   | Entre blocos (22px / 18 narrow)   |
+| `sectionGap` | Entre header e conteúdo           |
+| `itemGap`    | Entre itens de lista (12px)       |
+
+---
+
 ## 4. Tipografia
 
 **Contraste títulos vs corpo** – sem fontes display decorativas no fluxo.
+
+### Pesos (Inter)
+| Peso  | Uso                          |
+|-------|------------------------------|
+| 400   | Corpo, legendas              |
+| 500   | Subheading, labels secundários |
+| 600   | Dados, labels, títulos de card |
+| 700   | Ênfase, valores monetários   |
 
 ### Corpo (Inter)
 

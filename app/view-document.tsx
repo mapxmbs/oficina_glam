@@ -7,6 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import ImageCropModal from '../components/image-crop-modal';
 import { supabase } from '../lib/supabase';
 import { colors } from '../src/theme/colors';
+import { typography } from '../src/theme/typography';
+import { daysUntil, formatBR } from '../lib/dates';
 
 export default function ViewDocumentScreen() {
   const router = useRouter();
@@ -171,7 +173,7 @@ export default function ViewDocumentScreen() {
         <TouchableOpacity onPress={() => router.back()} style={{ padding: 8 }}>
           <ChevronLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 17, color: colors.text }}>
+        <Text style={[typography.screenTitle, { color: colors.text }]}>
           {documentType === 'CNH' ? 'CNH' : documentType === 'CRLV' ? 'CRLV' : 'Documento'}
         </Text>
         <View style={{ width: 40 }} />
@@ -185,7 +187,7 @@ export default function ViewDocumentScreen() {
           <TouchableOpacity onPress={() => setShowFullImage(true)} activeOpacity={0.9} style={{ marginBottom: 24 }}>
             <View style={{ backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 12, overflow: 'hidden', width: screenWidth - 48, alignSelf: 'center' }}>
               <Image source={{ uri: docUrl }} style={{ width: screenWidth - 48, height: 380 }} resizeMode="contain" />
-              <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 12, backgroundColor: 'rgba(0,0,0,0.5)', flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 12, backgroundColor: colors.overlayDark, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                 <Eye size={18} color="#fff" />
                 <Text style={{ color: '#fff', fontFamily: 'Inter_400Regular', fontSize: 13, marginLeft: 8 }}>Ver em tela cheia</Text>
               </View>
@@ -196,6 +198,24 @@ export default function ViewDocumentScreen() {
             <ImageIcon size={40} color={colors.textTertiary} />
             <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: colors.textTertiary, marginTop: 12 }}>Nenhuma imagem</Text>
           </View>
+          );
+        })()}
+
+        {/* Validade e alerta */}
+        {document.validade && (() => {
+          const dias = daysUntil(document.validade);
+          if (dias === null) return null;
+          const proximo = dias <= 30;
+          return (
+            <View style={{ marginBottom: 16, padding: 12, borderRadius: 12, backgroundColor: proximo ? 'rgba(234, 67, 53, 0.12)' : colors.surfaceTint, borderWidth: 1, borderColor: proximo ? colors.danger : colors.border }}>
+              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 13, color: colors.textTertiary }}>Validade: {formatBR(document.validade)}</Text>
+              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 14, color: proximo ? colors.danger : colors.text, marginTop: 4 }}>
+                {dias > 0 ? `Vence em ${dias} dia${dias !== 1 ? 's' : ''}` : dias === 0 ? 'Vence hoje' : `Vencido há ${Math.abs(dias)} dia${Math.abs(dias) !== 1 ? 's' : ''}`}
+              </Text>
+              {proximo && (
+                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 12, color: colors.danger, marginTop: 6 }}>⚠ Renove o documento em breve</Text>
+              )}
+            </View>
           );
         })()}
 
@@ -230,7 +250,7 @@ export default function ViewDocumentScreen() {
         animationType="fade"
         onRequestClose={() => setShowFullImage(false)}
       >
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)' }}>
+        <View style={{ flex: 1, backgroundColor: colors.overlayDarkest }}>
           <SafeAreaView style={{ flex: 1 }}>
             <View className="flex-row items-center justify-between p-4">
               <TouchableOpacity
@@ -239,7 +259,7 @@ export default function ViewDocumentScreen() {
               >
                 <ChevronLeft size={24} color={colors.iconOnAccent} />
               </TouchableOpacity>
-              <Text style={{ color: 'white', fontFamily: 'Inter_600SemiBold', fontSize: 18 }}>
+              <Text style={[typography.screenTitle, { color: 'white' }]}>
                 {documentType === 'CNH' ? 'CNH' : documentType === 'CRLV' ? 'CRLV' : 'Documento'}
               </Text>
               <View style={{ width: 40 }} />

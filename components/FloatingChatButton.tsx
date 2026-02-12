@@ -20,7 +20,7 @@ export function FloatingChatButton() {
     <View pointerEvents="box-none" style={[styles.wrapper, { bottom }]}>
       <Pressable
         onPress={() => router.push('/ia-module')}
-        style={({ pressed }) => [styles.bubble, { opacity: pressed ? 0.9 : 1 }]}
+        style={({ pressed }) => [styles.bubble, { transform: [{ scale: pressed ? 0.97 : 1 }] }]}
       >
         <Image
           source={require('../assets/brand/symbol.png')}
@@ -53,11 +53,11 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 18,
     maxWidth: 220,
-    elevation: 4,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
   },
   avatar: {
     width: 44,

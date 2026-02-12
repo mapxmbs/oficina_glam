@@ -19,6 +19,10 @@ type GlamTextProps = TextProps & {
 
 const colorMap: Partial<Record<string, string>> = {
   text: colors.text,
+  textPrimary: colors.textPrimary,
+  textHigh: colors.textHigh,
+  textMedium: colors.textMedium,
+  textLow: colors.textLow,
   textSecondary: colors.textSecondary,
   textTertiary: colors.textTertiary,
   accent: colors.accent,

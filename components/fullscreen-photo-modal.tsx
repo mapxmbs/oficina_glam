@@ -28,7 +28,7 @@ export default function FullscreenPhotoModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)' }}>
+      <View style={{ flex: 1, backgroundColor: colors.overlayDarkest }}>
         <SafeAreaView style={{ flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}>
             <TouchableOpacity

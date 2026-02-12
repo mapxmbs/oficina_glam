@@ -3,6 +3,8 @@ import { ArrowLeft, BookOpen, Send, Sparkles } from 'lucide-react-native';
 import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { colors } from '../../src/theme/colors';
+import { typography } from '../../src/theme/typography';
 
 // Mensagem Tipo
 type Message = {
@@ -57,56 +59,56 @@ export default function ManualChatScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
-      
-      {/* HEADER ESPECÍFICO PARA O BOT  */}
-      <View className="bg-white px-5 py-4 border-b border-gray-100 flex-row items-center shadow-sm z-10">
-        <TouchableOpacity onPress={() => router.back()} className="mr-3">
-          <ArrowLeft size={24} color="#4A4A4A" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Header – padrão das outras telas */}
+      <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+        <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12, padding: 8 }}>
+          <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
-        <View className="w-10 h-10 bg-glam-primary rounded-full items-center justify-center mr-3">
-          <Sparkles size={20} color="white" />
+        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.accentSoft, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+          <Sparkles size={20} color={colors.accent} />
         </View>
         <View>
-          <Text className="text-glam-dark font-bold text-lg">Glam IA</Text>
-          <Text className="text-gray-500 text-xs">Baseada no Manual do Proprietário</Text>
+          <Text style={[typography.screenTitle, { color: colors.text, fontSize: 22 }]}>Glam IA</Text>
+          <Text style={[typography.screenSubtitle, { color: colors.textMedium, marginTop: 4 }]}>Baseada no Manual do Proprietário</Text>
         </View>
       </View>
 
-      {/* ÁREA DE CHAT */}
+      {/* Área de chat */}
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
-        className="flex-1" 
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200} // Ajuste fino
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200}
       >
         <ScrollView 
           ref={scrollViewRef}
-          className="flex-1 px-5 pt-4"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 }}
         >
           {messages.map((msg) => (
             <View 
               key={msg.id} 
-              className={`flex-row mb-4 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              style={{ flexDirection: 'row', marginBottom: 16, justifyContent: msg.sender === 'user' ? 'flex-end' : 'flex-start' }}
             >
-              {/* Avatar do Bot se for msg do bot */}
               {msg.sender === 'bot' && (
-                <View className="w-8 h-8 bg-white rounded-full items-center justify-center border border-gray-200 mr-2 self-end mb-1">
-                   <BookOpen size={14} color="#E91E63" />
+                <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginRight: 8, alignSelf: 'flex-end', marginBottom: 4 }}>
+                  <BookOpen size={14} color={colors.accent} />
                 </View>
               )}
-
-              {/* Balão de Mensagem */}
               <View 
-                className={`px-4 py-3 rounded-2xl max-w-[80%] ${
-                  msg.sender === 'user' 
-                    ? 'bg-glam-primary rounded-tr-none' 
-                    : 'bg-white border border-gray-100 rounded-tl-none shadow-sm'
-                }`}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  borderRadius: 20,
+                  maxWidth: '80%',
+                  backgroundColor: msg.sender === 'user' ? colors.accent : colors.surface,
+                  borderTopRightRadius: msg.sender === 'user' ? 4 : 20,
+                  borderTopLeftRadius: msg.sender === 'bot' ? 4 : 20,
+                  borderWidth: msg.sender === 'bot' ? 1 : 0,
+                  borderColor: colors.border,
+                }}
               >
-                <Text 
-                  className={`text-base ${msg.sender === 'user' ? 'text-white' : 'text-gray-800'}`}
-                >
+                <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 15, color: msg.sender === 'user' ? colors.iconOnAccent : colors.text }}>
                   {msg.text}
                 </Text>
               </View>
@@ -114,12 +116,12 @@ export default function ManualChatScreen() {
           ))}
         </ScrollView>
 
-        {/* INPUT DE TEXTO */}
-        <View className="p-4 bg-white border-t border-gray-100 pb-8">
-          <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-full px-4 py-2">
+        <View style={{ padding: 16, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border, paddingBottom: 32 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surfaceTint, borderWidth: 1, borderColor: colors.border, borderRadius: 24, paddingHorizontal: 16, paddingVertical: 8 }}>
             <TextInput 
-              className="flex-1 text-base text-gray-700 h-10"
+              style={{ flex: 1, fontFamily: 'Inter_400Regular', fontSize: 16, color: colors.text, height: 40 }}
               placeholder="Pergunte sobre seu carro..."
+              placeholderTextColor={colors.textTertiary}
               value={inputText}
               onChangeText={setInputText}
               returnKeyType="send"
@@ -127,10 +129,10 @@ export default function ManualChatScreen() {
             />
             <TouchableOpacity 
               onPress={sendMessage}
-              className={`w-10 h-10 rounded-full items-center justify-center ml-2 ${inputText.trim() ? 'bg-glam-primary' : 'bg-gray-300'}`}
+              style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginLeft: 8, backgroundColor: inputText.trim() ? colors.accent : colors.surfaceTint }}
               disabled={!inputText.trim()}
             >
-              <Send size={18} color="white" />
+              <Send size={18} color={inputText.trim() ? colors.iconOnAccent : colors.textTertiary} />
             </TouchableOpacity>
           </View>
         </View>

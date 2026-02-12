@@ -1,12 +1,13 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import { AlertTriangle, BarChart3, Calendar, DollarSign, Droplet, Plus, Trash2, X } from 'lucide-react-native';
+import { AlertTriangle, Droplet, Plus, X } from 'lucide-react-native';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, Modal, RefreshControl, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ActivityIndicator, Alert, Modal, Pressable, Text, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../../lib/supabase';
+import { formatBR, isDateInRange, monthEnd, monthStart, toISOForCompare, weekEnd, weekStart } from '../../lib/dates';
 import { Screen } from '../../components/ui';
 import { colors } from '../../src/theme/colors';
-import { sectionHeaderAccent, spacing } from '../../src/theme/design-patterns';
+import { cardContent, chipActive, chipBase, headerMinimal, spacing } from '../../src/theme/design-patterns';
+import { typography } from '../../src/theme/typography';
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -19,121 +20,66 @@ export default function FuelScreen() {
   const [loading, setLoading] = useState(true);
   const [filterPeriod, setFilterPeriod] = useState<FilterPeriod>('todos');
   const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [metrics, setMetrics] = useState({
-    avgConsumption: 0,
-    weeklyLiters: 0,
-    monthlySpend: 0,
-    lastMonthSpend: 0,
-    bestFuel: 'N/D',
-    trend: 'stable' as 'up' | 'down' | 'stable',
-  });
 
-  async function fetchFuel() {
+  const fetchFuel = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('abastecimentos').select('*').order('id', { ascending: false });
-    if (!error && data) {
-      setLogs(data);
-      calculateMetrics(data);
-    } else setLogs([]);
-    setLoading(false);
-  }
-
-  function calculateMetrics(data: any[]) {
-    if (data.length === 0) return;
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
-    weekStart.setHours(0, 0, 0, 0);
-
-    const thisWeekLogs = data.filter(d => {
-      const [day, month, year] = (d.data || '').split('/');
-      if (!day || !month || !year) return false;
-      const logDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      return logDate >= weekStart;
-    });
-    const weeklyLiters = thisWeekLogs.reduce((acc, curr) => acc + curr.litros, 0);
-
-    const thisMonthLogs = data.filter(d => {
-      const [day, month, year] = (d.data || '').split('/');
-      if (!day || !month || !year) return false;
-      return parseInt(month) - 1 === currentMonth && parseInt(year) === currentYear;
-    });
-    const spendThisMonth = thisMonthLogs.reduce((acc, curr) => acc + curr.valor_total, 0);
-
-    let avg = 0;
-    if (data.length >= 2) {
-      const totalKm = data[0].km - data[data.length - 1].km;
-      const totalLitros = data.reduce((acc, curr) => acc + curr.litros, 0);
-      avg = totalLitros > 0 ? totalKm / totalLitros : 0;
+    try {
+      const { data, error } = await supabase
+        .from('abastecimentos')
+        .select('*')
+        .order('id', { ascending: false });
+      if (!error && data) setLogs(data);
+      else setLogs([]);
+    } catch (e) {
+      console.warn('Erro ao buscar abastecimentos:', e);
+      setLogs([]);
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    setMetrics({
-      avgConsumption: parseFloat(avg.toFixed(1)),
-      weeklyLiters: parseFloat(weeklyLiters.toFixed(1)),
-      monthlySpend: spendThisMonth,
-      lastMonthSpend: 0,
-      bestFuel: 'Gasolina',
-      trend: avg > 10 ? 'up' : 'down',
-    });
-  }
+  useFocusEffect(useCallback(() => {
+    fetchFuel();
+  }, [fetchFuel]));
 
-  useFocusEffect(useCallback(() => { fetchFuel(); }, []));
-
-  const filteredLogs = useMemo(() => {
-    if (filterPeriod === 'todos') return logs;
+  const { filteredLogs, displayMetrics } = useMemo(() => {
     const now = new Date();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
-    weekStart.setHours(0, 0, 0, 0);
-    return logs.filter((d) => {
-      const [day, month, year] = (d.data || '').split('/');
-      if (!day || !month || !year) return false;
-      const logDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      if (filterPeriod === 'semana') return logDate >= weekStart;
-      if (filterPeriod === 'mes') return logDate.getMonth() === now.getMonth() && logDate.getFullYear() === now.getFullYear();
-      if (filterPeriod === 'ano') return logDate.getFullYear() === now.getFullYear();
-      return true;
-    });
-  }, [logs, filterPeriod]);
+    const ws = weekStart(now);
+    const we = weekEnd(now);
+    const ms = monthStart(now);
+    const me = monthEnd(now);
+    const ys = `${now.getFullYear()}-01-01`;
+    const ye = `${now.getFullYear()}-12-31`;
 
-  const displayMetrics = useMemo(() => {
-    if (filteredLogs.length === 0) return metrics;
-    const data = filteredLogs;
-    const now = new Date();
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - now.getDay());
-    weekStart.setHours(0, 0, 0, 0);
-    const thisWeek = data.filter((d: any) => {
-      const [day, month, year] = (d.data || '').split('/');
-      if (!day || !month || !year) return false;
-      const logDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      return logDate >= weekStart;
-    });
-    const thisMonth = data.filter((d: any) => {
-      const [day, month, year] = (d.data || '').split('/');
-      if (!day || !month || !year) return false;
-      return parseInt(month) - 1 === now.getMonth() && parseInt(year) === now.getFullYear();
-    });
-    let avg = 0;
-    if (data.length >= 2) {
-      const sorted = [...data].sort((a: any, b: any) => b.id - a.id);
+    let filtered = logs;
+    if (filterPeriod === 'semana') filtered = logs.filter((d) => isDateInRange(d.data, ws, we));
+    else if (filterPeriod === 'mes') filtered = logs.filter((d) => isDateInRange(d.data, ms, me));
+    else if (filterPeriod === 'ano') filtered = logs.filter((d) => isDateInRange(d.data, ys, ye));
+
+    const thisWeek = filtered.filter((d) => isDateInRange(d.data, ws, we));
+    const thisMonth = filtered.filter((d) => isDateInRange(d.data, ms, me));
+    const weeklyLiters = thisWeek.reduce((acc, c) => acc + (c.litros || 0), 0);
+    const monthlySpend = thisMonth.reduce((acc, c) => acc + (c.valor_total || 0), 0);
+
+    let avgConsumption = 0;
+    if (filtered.length >= 2) {
+      const sorted = [...filtered].sort(
+        (a, b) => (toISOForCompare(b.data) ?? '').localeCompare(toISOForCompare(a.data) ?? '')
+      );
       const totalKm = sorted[0].km - sorted[sorted.length - 1].km;
-      const totalLitros = sorted.reduce((acc: number, curr: any) => acc + curr.litros, 0);
-      avg = totalLitros > 0 ? totalKm / totalLitros : 0;
+      const totalLitros = sorted.reduce((acc, c) => acc + (c.litros || 0), 0);
+      avgConsumption = totalLitros > 0 ? totalKm / totalLitros : 0;
     }
-    const spendMonth = thisMonth.reduce((acc: number, curr: any) => acc + curr.valor_total, 0);
-    const weeklyL = thisWeek.reduce((acc: number, curr: any) => acc + curr.litros, 0);
-    return {
-      avgConsumption: parseFloat(avg.toFixed(1)),
-      weeklyLiters: parseFloat(weeklyL.toFixed(1)),
-      monthlySpend: spendMonth,
-      lastMonthSpend: metrics.lastMonthSpend,
-      bestFuel: metrics.bestFuel,
-      trend: metrics.trend,
+
+    const displayMetrics = {
+      avgConsumption: parseFloat(avgConsumption.toFixed(1)),
+      weeklyLiters: parseFloat(weeklyLiters.toFixed(1)),
+      monthlySpend,
+      bestFuel: 'N/D' as string,
+      trend: (avgConsumption > 10 ? 'up' : 'down') as 'up' | 'down' | 'stable',
     };
-  }, [filteredLogs, metrics]);
+    return { filteredLogs: filtered, displayMetrics };
+  }, [logs, filterPeriod]);
 
   async function handleDelete(id: number) {
     Alert.alert("Excluir abastecimento", "Tem certeza? Essa ação não pode ser desfeita.", [
@@ -144,8 +90,7 @@ export default function FuelScreen() {
         onPress: async () => {
           const { error } = await supabase.from('abastecimentos').delete().eq('id', id);
           if (!error) {
-            setLogs(prev => prev.filter(item => item.id !== id));
-            calculateMetrics(logs.filter(item => item.id !== id));
+            setLogs((prev) => prev.filter((item) => item.id !== id));
             if (selectedItem?.id === id) setSelectedItem(null);
           } else Alert.alert("Erro", "Não foi possível excluir.");
         },
@@ -164,37 +109,31 @@ export default function FuelScreen() {
     <Screen
       refreshing={loading}
       onRefresh={fetchFuel}
-      contentContainerStyle={{ paddingBottom: spacing.screenPaddingBottom + 64 }}
+      contentContainerStyle={{ paddingBottom: spacing.screenPaddingBottom + spacing.tabBarBottom }}
     >
-      <View style={[sectionHeaderAccent, { marginBottom: spacing.sectionGap }]}>
-        <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 24, color: colors.iconOnAccent }}>Combustível</Text>
-        <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 14, color: colors.iconOnAccent, opacity: 0.9, marginTop: 4 }}>Rendimento e histórico</Text>
+      {/* Header minimalista */}
+      <View style={headerMinimal}>
+        <Text style={[typography.screenTitle, { color: colors.text }]}>Combustível</Text>
+        <Text style={[typography.screenSubtitle, { color: colors.textTertiary, marginTop: 4 }]}>Rendimento e histórico</Text>
       </View>
 
-      {/* Filtros compactos */}
-      <View style={{ flexDirection: 'row', gap: 8, marginBottom: spacing.sectionGap }}>
+      {/* Filtros – chips brancos, ativo beterraba */}
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: spacing.blockGap }}>
         {filters.map(({ key, label }) => (
           <TouchableOpacity
             key={key}
             onPress={() => setFilterPeriod(key)}
-            style={{
-              paddingHorizontal: 14,
-              paddingVertical: 8,
-              borderRadius: 20,
-              backgroundColor: filterPeriod === key ? colors.accent : 'transparent',
-              borderWidth: 1,
-              borderColor: filterPeriod === key ? colors.accent : colors.border,
-            }}
+            style={filterPeriod === key ? chipActive : chipBase}
           >
-            <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 13, color: filterPeriod === key ? colors.iconOnAccent : colors.textSecondary }}>{label}</Text>
+            <Text style={{ fontFamily: filterPeriod === key ? 'Inter_600SemiBold' : 'Inter_500Medium', fontSize: 13, color: filterPeriod === key ? colors.iconOnAccent : colors.textSecondary }}>{label}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Insights – surface branca, número accent com peso */}
-      <View style={{ backgroundColor: colors.surface, padding: 24, borderRadius: 16, marginBottom: spacing.sectionGap }}>
+      {/* Insights – card branco */}
+      <View style={[cardContent, { marginBottom: spacing.blockGap }]}>
         <View style={{ flexDirection: 'row', alignItems: 'baseline', marginBottom: 4 }}>
-          <Text style={{ fontFamily: 'Inter_700Bold', fontSize: 44, color: colors.accent }}>{displayMetrics.weeklyLiters || '0'}</Text>
+          <Text style={[typography.dataLg, { fontSize: 44, lineHeight: 50, color: colors.accent }]}>{displayMetrics.weeklyLiters || '0'}</Text>
           <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 16, color: colors.textTertiary, marginLeft: 8 }}>litros esta semana</Text>
         </View>
         {displayMetrics.weeklyLiters > 0 && (
@@ -216,51 +155,59 @@ export default function FuelScreen() {
 
       {/* Alerta só quando relevante */}
       {displayMetrics.avgConsumption < 8 && displayMetrics.avgConsumption > 0 && (
-        <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 14, marginBottom: spacing.sectionGap, backgroundColor: `${colors.danger}12`, borderRadius: 12, borderWidth: 1, borderColor: `${colors.danger}30` }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 14, marginBottom: spacing.blockGap, backgroundColor: `${colors.danger}12`, borderRadius: 12, borderWidth: 1, borderColor: `${colors.danger}30` }}>
           <AlertTriangle size={18} color={colors.danger} style={{ marginRight: 10 }} />
           <Text style={{ flex: 1, fontFamily: 'Inter_400Regular', fontSize: 13, color: colors.danger }}>Consumo acima do esperado. Verifique calibragem dos pneus.</Text>
         </View>
       )}
 
-      {/* CTA accent com presença */}
-      <TouchableOpacity
+      {/* CTA primário */}
+      <Pressable
         onPress={() => router.push('/forms/add-fuel')}
-        style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, marginBottom: spacing.sectionGap, borderRadius: 16, backgroundColor: colors.accent }}
+        style={({ pressed }) => ({
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingVertical: 16,
+          marginBottom: spacing.blockGap,
+          borderRadius: 28,
+          backgroundColor: colors.accent,
+          shadowColor: colors.accent,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 6,
+          elevation: 2,
+          transform: [{ scale: pressed ? 0.98 : 1 }],
+        })}
       >
         <Plus size={22} color={colors.iconOnAccent} />
         <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 16, color: colors.iconOnAccent, marginLeft: 10 }}>Adicionar abastecimento</Text>
-      </TouchableOpacity>
+      </Pressable>
 
-      {/* Lista – linhas, sem cards */}
-      <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 12, color: colors.textTertiary, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>Histórico</Text>
+      {/* Lista limpa – sem bordas decorativas, valor à direita, data discreta */}
+      <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 11, color: colors.textTertiary, marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>Histórico</Text>
       {loading && <ActivityIndicator color={colors.accent} style={{ marginVertical: 16 }} />}
-      {filteredLogs.map((log) => (
+      <View style={{ marginBottom: spacing.blockGap }}>
+      {filteredLogs.map((log, idx) => (
         <TouchableOpacity
           key={log.id}
           onPress={() => setSelectedItem(log)}
           onLongPress={() => handleDelete(log.id)}
           delayLongPress={500}
-          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, paddingHorizontal: 20, marginBottom: 8, backgroundColor: colors.surface, borderRadius: 12 }}
+          style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, borderTopWidth: idx === 0 ? 0 : 1, borderTopColor: colors.border }}
           activeOpacity={0.7}
         >
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: log.tipo === 'Etanol' ? `${colors.success}18` : `${colors.danger}18`, alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
-              <Droplet size={18} color={log.tipo === 'Etanol' ? colors.success : colors.danger} />
-            </View>
-            <View>
-              <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: colors.text }}>{log.posto}</Text>
-              <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 13, color: colors.textTertiary }}>{log.data} · {log.litros} L</Text>
-            </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: colors.text }}>{log.posto}</Text>
+            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 11, color: colors.textTertiary, marginTop: 2 }}>{formatBR(log.data)} · {log.litros} L · {log.km} km</Text>
           </View>
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: colors.text }}>{formatCurrency(log.valor_total)}</Text>
-            <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: colors.textTertiary }}>KM {log.km}</Text>
-          </View>
+          <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 15, color: colors.text }}>{formatCurrency(log.valor_total)}</Text>
         </TouchableOpacity>
       ))}
+      </View>
 
       <Modal visible={!!selectedItem} transparent animationType="fade" onRequestClose={() => setSelectedItem(null)}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+        <View style={{ flex: 1, backgroundColor: colors.overlayDark, justifyContent: 'center', alignItems: 'center', padding: 24 }}>
           <View style={{ backgroundColor: colors.surface, borderRadius: 20, padding: 28, width: '100%', maxWidth: 360 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -277,11 +224,11 @@ export default function FuelScreen() {
             <View style={{ borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
                 <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: colors.textTertiary }}>Data</Text>
-                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 14, color: colors.text }}>{selectedItem?.data}</Text>
+                <Text style={{ fontFamily: 'Inter_500Medium', fontSize: 14, color: colors.text }}>{formatBR(selectedItem?.data)}</Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
                 <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: colors.textTertiary }}>Valor</Text>
-                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 16, color: colors.accent }}>{selectedItem ? formatCurrency(selectedItem.valor_total) : ''}</Text>
+                <Text style={{ fontFamily: 'Inter_600SemiBold', fontSize: 16, color: colors.text }}>{selectedItem ? formatCurrency(selectedItem.valor_total) : ''}</Text>
               </View>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
                 <Text style={{ fontFamily: 'Inter_400Regular', fontSize: 12, color: colors.textTertiary }}>Posto</Text>

@@ -102,7 +102,7 @@ export default function ImageCropModal({
       animationType="slide"
       onRequestClose={handleClose}
     >
-      <SafeAreaView style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.9)' }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.overlayDarkest }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
           {/* Header */}
           <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
@@ -147,9 +147,9 @@ export default function ImageCropModal({
                 borderColor: colors.rosaClaro,
                 marginBottom: 30,
                 shadowColor: colors.rosaClaro,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.5,
-                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.06,
+                shadowRadius: 12,
                 elevation: 10,
               }}
             >
@@ -202,11 +202,10 @@ export default function ImageCropModal({
                   justifyContent: 'center',
                   alignItems: 'center',
                   shadowColor: colors.accent,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.4,
-                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 6,
                   elevation: 6,
-                  opacity: loading ? 0.7 : 1,
                 }}
               >
                 {loading ? (
@@ -268,11 +267,10 @@ export default function ImageCropModal({
                   justifyContent: 'center',
                   alignItems: 'center',
                   shadowColor: colors.headerBg,
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 6,
                   elevation: 6,
-                  opacity: picking ? 0.7 : 1,
                 }}
               >
                 {picking ? (
@@ -303,7 +301,6 @@ export default function ImageCropModal({
                   alignItems: 'center',
                   borderWidth: 1,
                   borderColor: 'rgba(255,255,255,0.3)',
-                  opacity: picking ? 0.7 : 1,
                 }}
               >
                 {picking ? (
